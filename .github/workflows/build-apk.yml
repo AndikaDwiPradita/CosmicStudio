@@ -24,6 +24,11 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          server-id: github
+          cache: 'gradle'
+
+      - name: Configure Gradle Java Options
+        run: echo "org.gradle.jvmargs=-Xmx512m --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED" >> ~/.gradle/gradle.properties
 
       - name: Install Dependencies
         run: npm install
