@@ -33,8 +33,21 @@ jobs:
 
       - name: Setup Android SDK
         run: |
-          ls /usr/local/android/sdk/ 2>/dev/null && echo "Android SDK found at /usr/local/android/sdk" || echo "Checking ANDROID_HOME..."
-          export ANDROID_HOME=${ANDROID_HOME:-/usr/local/android/sdk}
+          ANDROID_ROOT=/usr/local/android/sdk
+          if [ -d "$ANDROID_ROOT" ]; then
+            echo "Android SDK found at $ANDROID_ROOT"
+            export ANDROID_HOME=$ANDROID_ROOT
+          else
+            ANDROID_ROOT=/usr/lib/android/sdk
+            if [ -d "$ANDROID_ROOT" ]; then
+              echo "Android SDK found at $ANDROID_ROOT"
+              export ANDROID_HOME=$ANDROID_ROOT
+            else
+              echo "Android SDK not found at default paths"
+              ls /usr/local/android/sdk/ 2>/dev/null || echo "No SDK at /usr/local/android/sdk"
+              ls /usr/lib/android/sdk/ 2>/dev/null || echo "No SDK at /usr/lib/android/sdk"
+            fi
+          fi
           mkdir -p $ANDROID_HOME
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
 
