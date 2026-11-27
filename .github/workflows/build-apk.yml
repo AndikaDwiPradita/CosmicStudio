@@ -25,30 +25,31 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: actions/setup-android@v3
-        with:
-          api-level: 33
-          ndk-version: 25
-
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm install
 
-      - name: Build web app
+      - name: Build Web App
         run: npm run build
+
+      - name: Setup Android SDK
+        run: |
+          ls /usr/local/android/sdk/ 2>/dev/null && echo "Android SDK found at /usr/local/android/sdk" || echo "Checking ANDROID_HOME..."
+          export ANDROID_HOME=${ANDROID_HOME:-/usr/local/android/sdk}
+          mkdir -p $ANDROID_HOME
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
 
       - name: Sync Capacitor Android
         run: npx cap sync android
 
-      - name: Grant execute permission for gradlew
+      - name: Grant Execute Permission
         run: chmod +x android/gradlew
 
       - name: Build Android APK
         run: |
           cd android
-          ./gradlew assembleDebug
+          ANDROID_HOME=$ANDROID_HOME ./gradlew assembleDebug
 
-      - name: Upload APK artifact
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: CosmicStudio-debug-apk
