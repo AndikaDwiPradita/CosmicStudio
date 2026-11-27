@@ -614,6 +614,17 @@
         <div id="oauth-accounts-list" class="space-y-3">
           <!-- Rendered dynamically via JS -->
         </div>
+
+        <div id="empty-state" class="hidden text-center py-8">
+            <div class="w-12 h-12 rounded-2xl bg-[#111111] border border-white/[0.18] flex items-center justify-center mx-auto mb-3 neon-halo-soft">
+                <svg class="w-6 h-6 text-zinc-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 002 2v6a2 2 0 002 2zm0 0v-8m8 8v-8m-8 8h8"/>
+                </svg>
+            </div>
+            <h3 class="text-zinc-400 text-center text-sm font-bold">Belum ada akun yang terhubung</h3>
+            <p class="text-zinc-500 text-center text-xs">Hubungkan akun YouTube, TikTok, Instagram, atau X untuk memulai mengunggah video</p>
+            <button id="btn-connect-youtube" class="mt-4 px-5 py-2.5 rounded-xl neon-btn-primary text-xs font-extrabold">Hubungkan YouTube</button>
+        </div>
       </section>
 
     </main>
@@ -1732,6 +1743,7 @@
           icon.classList.add('text-zinc-100', 'neon-icon-subtle')
           text.classList.remove('text-zinc-500', 'font-medium')
           text.classList.add('text-zinc-100', 'font-bold', 'neon-text-subtle')
+          renderOAuthAccounts()
         } else {
           section.classList.add('hidden')
           indicator.classList.add('opacity-0')
@@ -2801,62 +2813,59 @@
     // =========================================================================
     function renderOAuthAccounts() {
       const list = document.getElementById('oauth-accounts-list')
+      const emptyState = document.getElementById('empty-state')
+      const connectedCount = appState.platforms.filter(p => p.connected).length
+
+      if (connectedCount === 0) {
+        list.innerHTML = ''
+        emptyState.classList.remove('hidden')
+        return
+      }
+
       list.innerHTML = appState.platforms.map(p => {
         if (p.connected) {
           return `
-            <div class="rounded-2xl bg-[#0A0A0A] border border-white/[0.16] p-4 space-y-3 transition">
-              <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3 min-w-0">
-                  <div class="w-10 h-10 rounded-2xl bg-[#E4E4E7] text-[#09090B] flex items-center justify-center shrink-0">
-                    ${PLATFORM_SVGS[p.id]}
-                  </div>
-                  <div class="min-w-0">
-                    <h3 class="text-sm font-bold text-zinc-100 truncate">${p.name}</h3>
-                    <p class="font-mono text-xs text-zinc-300 truncate">${p.handle}</p>
-                    <p class="font-mono text-[10px] text-zinc-500 mt-0.5">${p.followers}</p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onclick="openDisconnectModal('${p.id}')"
-                  class="px-3 py-2 rounded-xl bg-[#111111] hover:bg-[#191919] border border-hairline text-[11px] font-semibold text-zinc-300 transition shrink-0 active:scale-95"
-                >
-                  Putuskan
-                </button>
+            <div class="rounded-2xl bg-[#0A0A0A] border border-white/[0.16] p-4 flex items-start gap-4 transition">
+              <div class="w-14 h-14 rounded-2xl bg-[#E4E4E7] text-[#09090B] flex items-center justify-center flex-shrink-0">
+                ${PLATFORM_SVGS[p.id]}
               </div>
-
-              <div class="pt-2.5 border-t border-hairline flex items-center justify-between">
-                <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#111111] border border-white/[0.1]">
-                  <span class="w-1.5 h-1.5 rounded-full neon-dot-subtle animate-subtle-pulse"></span>
-                  <span class="font-mono text-[10px] font-semibold tracking-wider text-zinc-200">AKTIF • AUTO-REFRESH</span>
-                </div>
-                <span class="font-mono text-[10px] text-zinc-500">${p.apiLabel}</span>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-sm font-bold text-zinc-100 truncate line-clamp-1" title="${p.name}">${p.name}</h3>
+                <p class="font-mono text-xs text-zinc-300 truncate line-clamp-1" title="${p.handle}">${p.handle}</p>
+                <p class="font-mono text-[10px] text-zinc-500 mt-0.5 line-clamp-1" title="${p.followers}">${p.followers}</p>
               </div>
-            `
+              <button
+                type="button"
+                onclick="openDisconnectModal('${p.id}')"
+                class="ml-auto px-3 py-2 rounded-xl bg-[#111111] hover:bg-[#191919] border border-hairline text-[11px] font-semibold text-zinc-300 transition shrink-0 active:scale-95"
+              >
+                Putuskan
+              </button>
+            </div>
+          `
         } else {
           return `
-            <div class="rounded-2xl bg-[#0A0A0A] border border-hairline p-4 flex items-center justify-between gap-3 transition hover:border-white/[0.16]">
-              <div class="flex items-center gap-3 min-w-0">
-                <div class="w-10 h-10 rounded-2xl bg-[#111111] border border-hairline text-zinc-500 flex items-center justify-center shrink-0">
-                  ${PLATFORM_SVGS[p.id]}
-                </div>
-                <div class="min-w-0">
-                  <h3 class="text-sm font-bold text-zinc-300 truncate">${p.name}</h3>
-                  <p class="font-mono text-[10px] text-zinc-500 mt-0.5">BELUM TERHUBUNG</p>
-                </div>
+            <div class="rounded-2xl bg-[#0A0A0A] border border-hairline p-4 flex items-start gap-4 transition hover:border-white/[0.16]">
+              <div class="w-14 h-14 rounded-2xl bg-[#111111] border border-hairline flex items-center justify-center flex-shrink-0">
+                ${PLATFORM_SVGS[p.id]}
               </div>
-
+              <div class="flex-1 min-w-0">
+                <h3 class="text-sm font-bold text-zinc-300 truncate line-clamp-1" title="${p.name}">${p.name}</h3>
+                <p class="font-mono text-[10px] text-zinc-500 mt-0.5 line-clamp-1" title="${p.handle}">BELUM TERHUBUNG</p>
+              </div>
               <button
                 type="button"
                 onclick="openOAuthModal('${p.id}')"
-                class="px-3.5 py-2.5 rounded-xl neon-btn-primary text-xs font-extrabold shrink-0"
+                class="ml-auto px-3.5 py-2.5 rounded-xl neon-btn-primary text-xs font-extrabold shrink-0"
               >
                 Hubungkan Akun
               </button>
-            `
+            </div>
+          `
         }
       }).join('')
+
+      emptyState.classList.add('hidden')
     }
 
     function openOAuthModal(platformId) {
