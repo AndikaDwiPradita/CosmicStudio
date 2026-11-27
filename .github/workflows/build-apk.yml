@@ -51,6 +51,9 @@ jobs:
           mkdir -p $ANDROID_HOME
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
 
+      - name: Add Android Platform
+        run: npx cap add android
+
       - name: Sync Capacitor Android
         run: npx cap sync android
 
