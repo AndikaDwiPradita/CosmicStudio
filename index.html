@@ -623,7 +623,12 @@
             </div>
             <h3 class="text-zinc-400 text-center text-sm font-bold">Belum ada akun yang terhubung</h3>
             <p class="text-zinc-500 text-center text-xs">Hubungkan akun YouTube, TikTok, Instagram, atau X untuk memulai mengunggah video</p>
-            <button id="btn-connect-youtube" class="mt-4 px-5 py-2.5 rounded-xl neon-btn-primary text-xs font-extrabold">Hubungkan YouTube</button>
+            <div class="mt-4 space-y-2">
+                <button id="btn-connect-youtube" class="px-4 py-2.5 rounded-xl neon-btn-primary text-xs font-extrabold w-full">Hubungkan YouTube</button>
+                <button id="btn-connect-tiktok" class="px-4 py-2.5 rounded-xl bg-[#E4E4E7] text-[#111111] text-xs font-medium w-full">Hubungkan TikTok</button>
+                <button id="btn-connect-instagram" class="px-4 py-2.5 rounded-xl bg-[#E4E4E7] text-[#111111] text-xs font-medium w-full">Hubungkan Instagram</button>
+                <button id="btn-connect-x" class="px-4 py-2.5 rounded-xl bg-[#2A2A2A] text-white text-xs font-medium w-full">Hubungkan X</button>
+            </div>
         </div>
       </section>
 
@@ -2816,12 +2821,7 @@
       const emptyState = document.getElementById('empty-state')
       const connectedCount = appState.platforms.filter(p => p.connected).length
 
-      if (connectedCount === 0) {
-        list.innerHTML = ''
-        emptyState.classList.remove('hidden')
-        return
-      }
-
+      // Always re-render the list based on current connection state
       list.innerHTML = appState.platforms.map(p => {
         if (p.connected) {
           return `
@@ -2865,7 +2865,17 @@
         }
       }).join('')
 
-      emptyState.classList.add('hidden')
+      // Show empty state only when NO platforms are connected
+      if (connectedCount === 0) {
+        emptyState.classList.remove('hidden')
+        // Ensure the connect buttons are visible in empty state
+        document.getElementById('btn-connect-youtube').onclick = () => openOAuthModal('youtube')
+        document.getElementById('btn-connect-tiktok').onclick = () => openOAuthModal('tiktok')
+        document.getElementById('btn-connect-instagram').onclick = () => openOAuthModal('instagram')
+        document.getElementById('btn-connect-x').onclick = () => openOAuthModal('x')
+      } else {
+        emptyState.classList.add('hidden')
+      }
     }
 
     function openOAuthModal(platformId) {
