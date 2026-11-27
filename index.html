@@ -1,0 +1,2940 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Cosmic Studio — Multi-Platform Content Studio</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            oled: '#000000',
+            surface: '#0A0A0C',
+            surfaceElevated: '#111114',
+            hairlineBorder: '#1E1E24',
+            softWhite: '#E4E4E7',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ==========================================================================
+       Cosmic Studio — OLED Monochrome & Subtle 10-20% Neon Luminance System
+       ========================================================================== */
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #000000;
+      color: #E4E4E7;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* Subtle dark backdrop outside mobile frame on desktop */
+    .desktop-backdrop {
+      background-color: #030304;
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.025) 0%, transparent 60%),
+        linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+      background-size: 100% 100%, 36px 36px, 36px 36px;
+    }
+
+    /* Subtle text with soft white glow */
+    .neon-text-subtle {
+      color: #F4F4F5;
+      text-shadow: 0 0 8px rgba(255, 255, 231, 0.16);
+    }
+
+    .neon-card-active {
+      border-color: rgba(255, 255, 231, 0.26) !important;
+      box-shadow: 0 0 14px rgba(255, 255, 231, 0.14), inset 0 0 8px rgba(255, 255, 231, 0.03);
+    }
+
+    .neon-halo-soft {
+      box-shadow: 0 0 14px rgba(255, 255, 231, 0.12);
+    }
+
+    .neon-btn-primary {
+      background-color: #E4E4E7;
+      color: #09090B;
+      box-shadow: 0 0 14px rgba(255, 255, 231, 0.14);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .neon-btn-primary:hover:not(:disabled) {
+      background-color: #F4F4F5;
+      box-shadow: 0 0 16px rgba(255, 255, 231, 0.18);
+      transform: translateY(-1px);
+    }
+
+    .neon-btn-primary:active:not(:disabled) {
+      transform: scale(0.985);
+    }
+
+    .neon-btn-primary:disabled {
+      background-color: #111114;
+      color: #52525B;
+      box-shadow: none;
+      border: 1px solid #1E1E24;
+      cursor: not-allowed;
+    }
+
+    .neon-icon-subtle {
+      filter: drop-shadow(0 0 4px rgba(255, 255, 231, 0.16));
+    }
+
+    .neon-dot-subtle {
+      background-color: #E4E4E7;
+      box-shadow: 0 0 6px rgba(255, 255, 231, 0.20);
+    }
+
+    /* Crisp Hairline Borders */
+    .border-hairline {
+      border-color: rgba(255, 255, 231, 0.08);
+    }
+
+    /* Hide Scrollbars cleanly */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Gentle Pulse (10-20% opacity range) */
+    @keyframes subtlePulse {
+      0%, 100% {
+        opacity: 0.9;
+        box-shadow: 0 0 6px rgba(255, 255, 231, 0.2);
+      }
+      50% {
+        opacity: 0.4;
+        box-shadow: 0 0 2px rgba(255, 255, 231, 0.08);
+      }
+    }
+
+    .animate-subtle-pulse {
+      animation: subtlePulse 2.8s infinite ease-in-out;
+    }
+
+    /* Subtle Shimmer Progress Bar */
+    @keyframes subtleShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .progress-bar-subtle {
+      background: linear-gradient(90deg, #D4D4D8 0%, #8E8E93 50%, #D4D4D8 100%);
+      background-size: 200% 100%;
+      animation: subtleShimmer 2s linear infinite;
+      box-shadow: 0 0 8px rgba(255, 255, 231, 0.12);
+    }
+
+    /* Dark Calendar/Time Picker Icons */
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.85);
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body class="desktop-backdrop min-h-screen flex justify-center items-start sm:py-5">
+
+  <!-- Centered Mobile Viewport Frame (430px on desktop, 100% full height on mobile) -->
+  <div id="app-shell" class="w-full sm:max-w-[430px] min-h-screen sm:min-h-[860px] sm:h-[860px] bg-oled text-[#E4E4E7] relative flex flex-col sm:rounded-[38px] sm:border sm:border-white/[0.11] sm:shadow-[0_0_40px_rgba(255,255,255,0.04)] overflow-hidden">
+
+    <!-- Subtle Mobile Status Bar (Desktop Preview Only) -->
+    <div class="hidden sm:flex items-center justify-between px-6 pt-3 pb-1 text-[11px] font-mono text-zinc-500 bg-black select-none">
+      <span>05:08</span>
+      <div class="w-20 h-4 bg-[#0A0A0A] rounded-full border border-white/[0.07]"></div>
+      <div class="flex items-center gap-1.5">
+        <span>5G</span>
+        <div class="w-4 h-2.5 border border-zinc-500 rounded-[2px] p-[1px]">
+          <div class="w-full h-full bg-zinc-300"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky App Header -->
+    <header class="sticky top-0 z-30 bg-black/90 backdrop-blur-xl border-b border-hairline px-4 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <!-- Monochrome Logo Mark -->
+        <div class="w-8 h-8 rounded-lg bg-[#E4E4E7] text-[#09090B] flex items-center justify-center font-mono font-bold text-xs neon-halo-soft">
+          N//
+        </div>
+        <div>
+          <h1 class="text-sm font-extrabold tracking-wider neon-text-subtle leading-none">
+            Cosmic <span class="font-light text-zinc-500">Studio</span>
+          </h1>
+          <p class="text-[10px] font-mono text-zinc-500 tracking-widest mt-0.5">MULTI-STREAM STUDIO</p>
+        </div>
+      </div>
+
+      <!-- Active Accounts Status Pill -->
+      <button type="button" onclick="switchTab('akun')" class="flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-[#0A0A0C] border border-hairline hover:border-white/25 transition active:scale-95">
+        <span class="w-1.5 h-1.5 rounded-full neon-dot-subtle animate-subtle-pulse"></span>
+        <span id="header-active-count" class="font-mono text-[10px] font-semibold tracking-wider text-zinc-300">4 AKUN AKTIF</span>
+      </button>
+    </header>
+
+    <!-- Non-blocking Toast Banner Container -->
+    <div id="toast-container" class="pointer-events-none fixed sm:absolute top-16 left-0 right-0 z-50 px-4 flex flex-col items-center gap-2"></div>
+
+    <!-- Main Scrollable Viewport -->
+    <main id="main-scroll" class="flex-1 overflow-y-auto no-scrollbar pb-28 px-4 pt-4 space-y-5">
+
+      <!-- ===================================================================== -->
+      <!-- TAB 1: STUDIO (UPLOAD & CROSS-POST)                                   -->
+      <!-- ===================================================================== -->
+      <section id="tab-studio" class="space-y-5">
+
+        <!-- 1. Video Upload & Preview Section -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400">1. Media Sumber</span>
+            <span class="font-mono text-[10px] text-zinc-500">MP4 / MOV • MAX 500MB</span>
+          </div>
+
+          <!-- Empty Dropzone -->
+          <div
+            id="upload-empty-state"
+            ondragover="handleDragOver(event)"
+            ondragleave="handleDragLeave(event)"
+            ondrop="handleDropFile(event)"
+            class="rounded-2xl bg-[#0A0A0A] border border-dashed border-white/[0.15] p-5 flex flex-col items-center text-center transition hover:border-white/30"
+          >
+            <div class="w-11 h-11 rounded-2xl bg-[#111111] border border-hairline flex items-center justify-center mb-3 neon-halo-soft">
+              <svg class="w-5 h-5 text-zinc-200 neon-icon-subtle" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+              </svg>
+            </div>
+            <p class="text-sm font-semibold text-zinc-100">Unggah Video Vertikal atau Feed</p>
+            <p class="text-xs text-zinc-500 mt-1 max-w-[250px]">Satu kali unggah untuk distribusi otomatis ke seluruh platform yang dipilih.</p>
+
+            <div class="mt-4 flex flex-col w-full gap-2">
+              <label class="w-full py-2.5 px-4 rounded-xl bg-[#111111] hover:bg-[#171717] border border-hairline text-xs font-semibold text-zinc-200 cursor-pointer transition flex items-center justify-center gap-2 active:scale-[0.99]">
+                <svg class="w-4 h-4 text-zinc-300" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.2z"/>
+                </svg>
+                <span>Pilih File Video Perangkat</span>
+                <input type="file" id="video-file-input" accept="video/*" class="hidden" onchange="handleLocalVideoSelect(event)" />
+              </label>
+
+              <button type="button" onclick="loadDemoVideo()" class="w-full py-2.5 px-4 rounded-xl bg-[#141414] hover:bg-[#1C1C1C] border border-white/[0.18] text-xs font-semibold text-zinc-100 transition flex items-center justify-center gap-2 neon-halo-soft active:scale-[0.99]">
+                <svg class="w-4 h-4 text-zinc-200 neon-icon-subtle" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/>
+                </svg>
+                <span>Gunakan Video Demo (9:16)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Video Preview Card -->
+          <div id="upload-preview-state" class="hidden rounded-2xl bg-[#0A0A0A] border border-white/[0.24] p-3.5 neon-card-active">
+            <div class="flex gap-3.5 items-center">
+              <!-- Vertical 9:16 Video Frame -->
+              <div class="relative w-[104px] h-[184px] rounded-xl overflow-hidden bg-black border border-white/[0.16] shrink-0 flex items-center justify-center">
+                <canvas id="demo-video-canvas" width="208" height="368" class="w-full h-full object-cover"></canvas>
+                <video id="local-video-player" class="hidden w-full h-full object-cover" loop muted playsinline autoplay></video>
+
+                <div class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-md border border-white/[0.12] font-mono text-[9px] text-zinc-200">
+                  9:16
+                </div>
+
+                <button type="button" onclick="togglePreviewPlayback()" aria-label="Play or Pause Preview" class="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-black/85 border border-white/25 flex items-center justify-center text-zinc-200 hover:bg-zinc-200 hover:text-black transition">
+                  <svg id="preview-play-icon" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Video Metadata & Specs -->
+              <div class="flex-1 min-w-0 space-y-2.5">
+                <div>
+                  <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#141414] border border-white/[0.14] font-mono text-[10px] text-zinc-200">
+                    <span class="w-1.5 h-1.5 rounded-full neon-dot-subtle"></span> SIAP DISTRIBUSI
+                  </span>
+                  <h3 id="video-filename" class="text-sm font-bold text-zinc-100 truncate mt-1.5">nexus_setup_2026.mp4</h3>
+                </div>
+
+                <div class="grid grid-cols-2 gap-1.5 font-mono text-[10px]">
+                  <div class="p-2 rounded-lg bg-[#111111] border border-hairline">
+                    <span class="text-zinc-500 block">RESOLUSI / FPS</span>
+                    <span id="video-resolution" class="text-zinc-200 font-semibold">1080x1920 • 60fps</span>
+                  </div>
+                  <div class="p-2 rounded-lg bg-[#111111] border border-hairline">
+                    <span class="text-zinc-500 block">UKURAN / DURASI</span>
+                    <span id="video-size-duration" class="text-zinc-200 font-semibold">24.8 MB • 00:45</span>
+                  </div>
+                </div>
+
+                <button type="button" onclick="resetVideoUpload()" class="w-full py-2 px-3 rounded-xl bg-[#111111] hover:bg-[#191919] border border-hairline text-xs font-semibold text-zinc-300 transition flex items-center justify-center gap-1.5 active:scale-95">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                  </svg>
+                  <span>Ganti Video</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Target Platforms Selector -->
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400">2. Akun Tujuan</span>
+            <button type="button" onclick="switchTab('akun')" class="font-mono text-[10px] text-zinc-400 hover:text-zinc-200 underline underline-offset-4">
+              + Kelola Koneksi
+            </button>
+          </div>
+
+          <div id="studio-platforms-grid" class="grid grid-cols-2 gap-2.5">
+            <!-- Dynamically populated from connected OAuth accounts -->
+          </div>
+        </div>
+
+        <!-- 3. Metadata & Caption Form -->
+        <div class="space-y-3 rounded-2xl bg-[#0A0A0A] border border-hairline p-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400">3. Metadata & Caption</span>
+            <span id="caption-counter" class="font-mono text-[10px] text-zinc-500">0 / 2200</span>
+          </div>
+
+          <!-- Video Title -->
+          <div class="space-y-1">
+            <label for="post-title" class="text-[11px] font-medium text-zinc-400">Judul Video (YouTube Shorts / LinkedIn)</label>
+            <input
+              type="text"
+              id="post-title"
+              placeholder="Contoh: Minimalist OLED Coding Setup 2026..."
+              class="w-full px-3.5 py-2.5 rounded-xl bg-[#111111] border border-hairline focus:border-white/30 focus:outline-none text-sm text-zinc-100 placeholder-zinc-600 transition"
+            />
+          </div>
+
+          <!-- Global Caption -->
+          <div class="space-y-1.5">
+            <label for="post-caption" class="text-[11px] font-medium text-zinc-400">Caption Utama</label>
+            <textarea
+              id="post-caption"
+              rows="3"
+              oninput="updateCaptionCount()"
+              placeholder="Tulis deskripsi singkat atau hook untuk audiens Anda..."
+              class="w-full px-3.5 py-2.5 rounded-xl bg-[#111111] border border-hairline focus:border-white/30 focus:outline-none text-sm text-zinc-100 placeholder-zinc-600 transition resize-none"
+            ></textarea>
+
+            <!-- Quick Hashtag Chips -->
+            <div class="flex flex-wrap gap-1.5 pt-0.5">
+              <button type="button" onclick="appendHashtag('#tech')" class="px-2.5 py-1 rounded-lg bg-[#111111] hover:bg-[#E4E4E7] hover:text-[#09090B] border border-hairline font-mono text-[11px] text-zinc-300 transition active:scale-95">#tech</button>
+              <button type="button" onclick="appendHashtag('#coding')" class="px-2.5 py-1 rounded-lg bg-[#111111] hover:bg-[#E4E4E7] hover:text-[#09090B] border border-hairline font-mono text-[11px] text-zinc-300 transition active:scale-95">#coding</button>
+              <button type="button" onclick="appendHashtag('#setup')" class="px-2.5 py-1 rounded-lg bg-[#111111] hover:bg-[#E4E4E7] hover:text-[#09090B] border border-hairline font-mono text-[11px] text-zinc-300 transition active:scale-95">#setup</button>
+              <button type="button" onclick="appendHashtag('#tutorial')" class="px-2.5 py-1 rounded-lg bg-[#111111] hover:bg-[#E4E4E7] hover:text-[#09090B] border border-hairline font-mono text-[11px] text-zinc-300 transition active:scale-95">#tutorial</button>
+            </div>
+          </div>
+
+          <!-- Toggle: Custom Caption per Platform -->
+          <div class="pt-2.5 border-t border-hairline">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs font-semibold text-zinc-200">Caption Khusus per Platform</p>
+                <p class="text-[10px] text-zinc-500">Sesuaikan gaya bahasa tiap media sosial</p>
+              </div>
+              <button type="button" id="custom-caption-toggle" onclick="toggleCustomCaptions()" role="switch" aria-checked="false" class="w-11 h-6 rounded-full bg-[#141414] border border-white/[0.12] p-0.5 transition-colors relative">
+                <span id="custom-caption-knob" class="block w-[18px] h-[18px] rounded-full bg-zinc-500 transition-transform duration-200"></span>
+              </button>
+            </div>
+
+            <!-- Collapsible Per-Platform Custom Caption Tabs & Editor -->
+            <div id="custom-captions-container" class="hidden mt-3 space-y-2.5 pt-2.5 border-t border-hairline">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Schedule Settings -->
+        <div class="space-y-3 rounded-2xl bg-[#0A0A0A] border border-hairline p-4">
+          <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400 block">4. Waktu Tayang</span>
+
+          <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-[#111111] border border-hairline">
+            <button type="button" id="btn-mode-now" onclick="setScheduleMode('now')" class="py-2 px-3 rounded-lg text-xs font-bold bg-[#E4E4E7] text-[#09090B] neon-halo-soft transition">
+              Tayangkan Sekarang
+            </button>
+            <button type="button" id="btn-mode-schedule" onclick="setScheduleMode('schedule')" class="py-2 px-3 rounded-lg text-xs font-semibold text-zinc-400 hover:text-zinc-200 transition">
+              Jadwalkan
+            </button>
+          </div>
+
+          <div id="schedule-inputs" class="hidden grid grid-cols-2 gap-2.5 pt-1">
+            <div class="space-y-1">
+              <label class="font-mono text-[10px] text-zinc-500">TANGGAL</label>
+              <input type="date" id="schedule-date" class="w-full px-3 py-2 rounded-xl bg-[#111111] border border-white/[0.14] text-xs font-mono text-zinc-200 focus:border-white/30 focus:outline-none" />
+            </div>
+            <div class="space-y-1">
+              <label class="font-mono text-[10px] text-zinc-500">JAM (WIB)</label>
+              <input type="time" id="schedule-time" value="19:30" class="w-full px-3 py-2 rounded-xl bg-[#111111] border border-white/[0.14] text-xs font-mono text-zinc-200 focus:border-white/30 focus:outline-none" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Primary CTA Button -->
+        <div class="pt-1 pb-2">
+          <button type="button" id="btn-publish-cta" onclick="handlePublishSubmit()" class="w-full py-4 px-5 rounded-2xl neon-btn-primary font-extrabold text-sm tracking-wide flex items-center justify-center gap-2.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
+            </svg>
+            <span id="cta-label">Publikasikan ke 4 Platform</span>
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 2: ANALITIK (SEPARATED PER-PLATFORM & PER-CONTENT STUDIO)         -->
+      <!-- ===================================================================== -->
+      <section id="tab-analitik" class="space-y-4">
+
+        <!-- VIEW A: PLATFORM CHANNEL OVERVIEW & ALL VIDEOS LIST -->
+        <div id="analytics-platform-view" class="space-y-4">
+
+          <!-- 1. Top Horizontal Platform Switcher Tabs (Strict Separation) -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-[10px] uppercase tracking-widest text-zinc-500">ANALITIK TERPISAH PER PLATFORM</span>
+              <span id="analytics-platform-badge" class="font-mono text-[10px] text-zinc-400">YOUTUBE STUDIO</span>
+            </div>
+
+            <div id="analytics-platform-tabs" class="grid grid-cols-4 gap-1.5">
+              <!-- Populated dynamically via JS: YouTube, TikTok, Instagram, X -->
+            </div>
+          </div>
+
+          <!-- 2. Platform Channel Overview Card -->
+          <div id="analytics-channel-card" class="rounded-2xl bg-[#0A0A0C] border border-hairline p-4 space-y-3.5">
+            <!-- Populated dynamically via JS for selected platform -->
+          </div>
+
+          <!-- 3. All Videos List for Selected Platform -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <h2 id="platform-videos-heading" class="text-sm font-bold text-zinc-100 neon-text-subtle">Semua Konten YouTube</h2>
+                <p class="text-[11px] text-zinc-500">Ketuk video untuk analitik mendalam per konten</p>
+              </div>
+              <span id="platform-videos-count" class="font-mono text-[10px] px-2 py-0.5 rounded-md bg-[#111114] border border-hairline text-zinc-300">
+                4 VIDEO
+              </span>
+            </div>
+
+            <!-- Sort Control Pills -->
+            <div class="grid grid-cols-3 gap-1 p-1 rounded-xl bg-[#0A0A0C] border border-hairline">
+              <button type="button" onclick="setVideoSortOrder('newest')" id="sort-newest" class="py-1.5 px-2 rounded-lg font-mono text-[10px] font-bold bg-[#E4E4E7] text-[#09090B] transition">
+                Terbaru
+              </button>
+              <button type="button" onclick="setVideoSortOrder('views')" id="sort-views" class="py-1.5 px-2 rounded-lg font-mono text-[10px] font-semibold text-zinc-400 hover:text-zinc-200 transition">
+                Views Tertinggi
+              </button>
+              <button type="button" onclick="setVideoSortOrder('engagement')" id="sort-engagement" class="py-1.5 px-2 rounded-lg font-mono text-[10px] font-semibold text-zinc-400 hover:text-zinc-200 transition">
+                Engagement Tertinggi
+              </button>
+            </div>
+
+            <!-- Vertical List of 4 Distinct Videos on Selected Platform -->
+            <div id="platform-videos-list" class="space-y-2.5">
+              <!-- Populated dynamically via JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW B: PER-VIDEO DEEP-DIVE ANALYTICS SCREEN -->
+        <div id="analytics-video-detail-view" class="hidden space-y-4">
+
+          <!-- Back Navigation Header -->
+          <div class="flex items-center justify-between gap-2">
+            <button
+              type="button"
+              id="btn-back-to-videos"
+              onclick="closeSingleVideoAnalytics()"
+              class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0A0A0C] hover:bg-[#111114] border border-hairline hover:border-white/25 text-xs font-semibold text-zinc-200 transition active:scale-95"
+            >
+              <span id="back-button-label">← Semua Video YouTube</span>
+            </button>
+
+            <div id="single-video-platform-pill" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#111114] border border-hairline font-mono text-[10px] text-zinc-300">
+              <!-- Platform icon + handle -->
+            </div>
+          </div>
+
+          <!-- Single-Video Preview Header Card -->
+          <div id="single-video-header-card" class="rounded-2xl bg-[#0A0A0C] border border-white/[0.18] p-3.5 neon-card-active">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <!-- 6 Platform-Native KPI Cards (2x3 Grid) -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">Metrik Utama Video</span>
+              <span id="single-video-kpi-subtitle" class="font-mono text-[10px] text-zinc-500">YOUTUBE NATIVE METRICS</span>
+            </div>
+            <div id="single-video-kpi-grid" class="grid grid-cols-2 gap-2.5">
+              <!-- Populated dynamically via JS (6 KPI cards) -->
+            </div>
+          </div>
+
+          <!-- Interactive SVG Growth Chart for This Specific Video -->
+          <div class="rounded-2xl bg-[#0A0A0C] border border-hairline p-4 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-bold text-zinc-100">Grafik Pertumbuhan Video</span>
+                <p class="font-mono text-[10px] text-zinc-500 mt-0.5">Ketuk titik untuk detail tayangan</p>
+              </div>
+
+              <!-- Granularity Toggle -->
+              <div class="flex items-center gap-1 p-1 rounded-xl bg-[#111114] border border-hairline">
+                <button type="button" onclick="setVideoChartGranularity('hourly')" id="vcg-hourly" class="px-2 py-1 rounded-lg font-mono text-[10px] font-semibold text-zinc-400 hover:text-zinc-200 transition">24 Jam</button>
+                <button type="button" onclick="setVideoChartGranularity('daily')" id="vcg-daily" class="px-2 py-1 rounded-lg font-mono text-[10px] font-bold bg-[#E4E4E7] text-[#09090B] transition">7 Hari</button>
+              </div>
+            </div>
+
+            <div class="relative pt-2">
+              <!-- Tooltip -->
+              <div id="video-chart-tooltip" class="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 z-20 px-3 py-1 rounded-xl bg-[#111114]/95 backdrop-blur-md border border-white/[0.22] neon-halo-soft flex items-center gap-2 whitespace-nowrap">
+                <span id="vct-label" class="font-mono text-[10px] text-zinc-400">Hari ke-7</span>
+                <span class="w-1 h-1 rounded-full bg-zinc-500"></span>
+                <span id="vct-value" class="font-mono text-xs font-bold text-zinc-100 neon-text-subtle">84.200 Views</span>
+              </div>
+
+              <div id="single-video-growth-chart" class="w-full h-[164px] select-none">
+                <!-- SVG Growth Chart injected via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Audience Retention Curve (SVG) for This Specific Video -->
+          <div class="rounded-2xl bg-[#0A0A0C] border border-hairline p-4 space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="text-xs font-bold text-zinc-100">Kurva Retensi Penonton</span>
+                <p id="sv-retention-summary" class="font-mono text-[11px] text-zinc-300 mt-0.5 neon-text-subtle">Rata-rata selesai 78% • 0:35 / 0:45</p>
+              </div>
+              <span id="sv-hook-badge" class="px-2 py-1 rounded-lg bg-[#111114] border border-white/[0.14] font-mono text-[10px] font-semibold text-zinc-200 shrink-0">
+                Hook 3d: 86%
+              </span>
+            </div>
+
+            <div id="single-video-retention-svg" class="w-full h-[94px]">
+              <!-- SVG Retention Curve injected via JS -->
+            </div>
+          </div>
+
+          <!-- Platform-Specific Traffic Sources Breakdown -->
+          <div class="rounded-2xl bg-[#0A0A0C] border border-hairline p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-zinc-100">Sumber Trafik Penonton</span>
+              <span id="sv-traffic-platform-tag" class="font-mono text-[10px] text-zinc-500">YOUTUBE DISCOVERY</span>
+            </div>
+
+            <div id="single-video-traffic-list" class="space-y-2.5">
+              <!-- Monochrome progress bars injected via JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 3: ANTREAN (BACKGROUND QUEUE & PUBLISHING STATUS)                 -->
+      <!-- ===================================================================== -->
+      <section id="tab-antrean" class="hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-bold text-zinc-100 neon-text-subtle">Antrean Publikasi</h2>
+            <p class="text-[11px] text-zinc-500">Distribusi paralel real-time via Worker Queue</p>
+          </div>
+          <span id="queue-total-badge" class="font-mono text-[10px] px-2.5 py-1 rounded-full bg-[#0A0A0A] border border-hairline text-zinc-300">
+            4 TUGAS
+          </span>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="grid grid-cols-4 gap-1 p-1 rounded-xl bg-[#0A0A0A] border border-hairline">
+          <button type="button" onclick="setQueueFilter('all')" id="qf-all" class="py-1.5 rounded-lg font-mono text-[10px] font-bold bg-[#E4E4E7] text-[#09090B] transition">Semua</button>
+          <button type="button" onclick="setQueueFilter('proses')" id="qf-proses" class="py-1.5 rounded-lg font-mono text-[10px] font-semibold text-zinc-400 hover:text-zinc-200 transition">Proses</button>
+          <button type="button" onclick="setQueueFilter('selesai')" id="qf-selesai" class="py-1.5 rounded-lg font-mono text-[10px] font-semibold text-zinc-400 hover:text-zinc-200 transition">Selesai</button>
+          <button type="button" onclick="setQueueFilter('gagal')" id="qf-gagal" class="py-1.5 rounded-lg font-mono text-[10px] font-semibold text-zinc-400 hover:text-zinc-200 transition">Gagal</button>
+        </div>
+
+        <!-- Queue Cards List -->
+        <div id="queue-list-container" class="space-y-3">
+          <!-- Rendered dynamically via JS -->
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 4: AKUN (OAUTH 2.0 CONNECTIONS)                                   -->
+      <!-- ===================================================================== -->
+      <section id="tab-akun" class="hidden space-y-4">
+        <div class="rounded-2xl bg-[#0A0A0A] border border-hairline p-4 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold text-zinc-100 neon-text-subtle">Koneksi OAuth 2.0</h2>
+            <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-[#141414] border border-white/[0.12] text-zinc-300">AES-256 ENCRYPTED</span>
+          </div>
+          <p class="text-xs text-zinc-500 leading-relaxed">
+            Login langsung melalui portal resmi masing-masing platform. Token akses disimpan terenkripsi tanpa pernah menyimpan kata sandi Anda.
+          </p>
+        </div>
+
+        <!-- OAuth Account Cards -->
+        <div id="oauth-accounts-list" class="space-y-3">
+          <!-- Rendered dynamically via JS -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Glassmorphism Navigation Bar (4 Tabs) -->
+    <nav class="sticky bottom-0 z-30 bg-black/90 backdrop-blur-xl border-t border-hairline px-2 py-2">
+      <div class="grid grid-cols-4 gap-1">
+        <!-- Tab 1: Studio -->
+        <button type="button" onclick="switchTab('studio')" id="nav-studio" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition relative">
+          <div id="nav-indicator-studio" class="opacity-0 absolute -top-2 w-7 h-[2px] bg-[#E4E4E7] neon-halo-soft rounded-full transition-opacity"></div>
+          <svg id="nav-icon-studio" class="w-5 h-5 text-zinc-500 mb-1" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+          </svg>
+          <span id="nav-text-studio" class="text-[10px] font-medium text-zinc-500">Studio</span>
+        </button>
+
+        <!-- Tab 2: Analitik (Active by default) -->
+        <button type="button" onclick="switchTab('analitik')" id="nav-analitik" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition relative">
+          <div id="nav-indicator-analitik" class="absolute -top-2 w-7 h-[2px] bg-[#E4E4E7] neon-halo-soft rounded-full transition-opacity"></div>
+          <svg id="nav-icon-analitik" class="w-5 h-5 text-zinc-100 neon-icon-subtle mb-1" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/>
+          </svg>
+          <span id="nav-text-analitik" class="text-[10px] font-bold text-zinc-100 neon-text-subtle">Analitik</span>
+        </button>
+
+        <!-- Tab 3: Antrean -->
+        <button type="button" onclick="switchTab('antrean')" id="nav-antrean" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition relative">
+          <div id="nav-indicator-antrean" class="opacity-0 absolute -top-2 w-7 h-[2px] bg-[#E4E4E7] neon-halo-soft rounded-full transition-opacity"></div>
+          <div class="relative">
+            <svg id="nav-icon-antrean" class="w-5 h-5 text-zinc-500 mb-1" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/>
+            </svg>
+            <span id="nav-queue-dot" class="hidden absolute -top-0.5 -right-1.5 w-1.5 h-1.5 rounded-full neon-dot-subtle animate-subtle-pulse"></span>
+          </div>
+          <span id="nav-text-antrean" class="text-[10px] font-medium text-zinc-500">Antrean</span>
+        </button>
+
+        <!-- Tab 4: Akun -->
+        <button type="button" onclick="switchTab('akun')" id="nav-akun" class="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition relative">
+          <div id="nav-indicator-akun" class="opacity-0 absolute -top-2 w-7 h-[2px] bg-[#E4E4E7] neon-halo-soft rounded-full transition-opacity"></div>
+          <svg id="nav-icon-akun" class="w-5 h-5 text-zinc-500 mb-1" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/>
+          </svg>
+          <span id="nav-text-akun" class="text-[10px] font-medium text-zinc-500">Akun</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL: OAUTH 2.0 CONSENT SCREEN                                       -->
+    <!-- ===================================================================== -->
+    <div id="oauth-modal" class="hidden fixed sm:absolute inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
+      <div class="w-full max-w-[380px] rounded-3xl bg-[#0A0A0A] border border-white/[0.18] p-5 space-y-4 shadow-[0_0_24px_rgba(255,255,255,0.06)]">
+        <div class="flex items-center justify-between border-b border-hairline pb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full neon-dot-subtle"></span>
+            <span class="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">OAUTH 2.0 CONSENT</span>
+          </div>
+          <button type="button" onclick="closeOAuthModal()" class="text-zinc-500 hover:text-zinc-200 p-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Connection Visual -->
+        <div class="flex items-center justify-center gap-4 py-2">
+          <div class="w-12 h-12 rounded-2xl bg-[#E4E4E7] text-[#09090B] font-mono font-bold text-sm flex items-center justify-center neon-halo-soft">
+            N//
+          </div>
+          <div class="flex items-center gap-1 text-zinc-500 font-mono text-xs">
+            <span>•••</span>
+            <svg class="w-4 h-4 text-zinc-200 neon-icon-subtle" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/>
+            </svg>
+            <span>•••</span>
+          </div>
+          <div id="oauth-modal-icon" class="w-12 h-12 rounded-2xl bg-[#111111] border border-white/[0.18] flex items-center justify-center text-zinc-200 neon-halo-soft">
+            <!-- Platform SVG -->
+          </div>
+        </div>
+
+        <div class="text-center space-y-1">
+          <h3 id="oauth-modal-title" class="text-sm font-bold text-zinc-100">Izinkan NEXUS // POST mengakses akun Anda?</h3>
+          <p id="oauth-modal-subtitle" class="text-xs text-zinc-500">Otorisasi resmi melalui protokol OAuth 2.0</p>
+        </div>
+
+        <!-- Requested Scopes -->
+        <div class="rounded-2xl bg-[#111111] border border-hairline p-3 space-y-2.5 text-xs">
+          <div class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-zinc-200 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+            </svg>
+            <div>
+              <p class="font-semibold text-zinc-200">Mengunggah & mempublikasikan video</p>
+              <p class="font-mono text-[10px] text-zinc-500">scope: video.publish, content.write</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-zinc-200 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+            </svg>
+            <div>
+              <p class="font-semibold text-zinc-200">Membaca statistik tayangan & interaksi</p>
+              <p class="font-mono text-[10px] text-zinc-500">scope: insights.read, user.info.basic</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 pt-1">
+          <button type="button" onclick="closeOAuthModal()" class="py-3 px-4 rounded-xl bg-[#141414] hover:bg-[#1B1B1B] border border-hairline text-xs font-semibold text-zinc-300 transition">
+            Batal
+          </button>
+          <button type="button" id="btn-oauth-approve" onclick="approveOAuthConnection()" class="py-3 px-4 rounded-xl neon-btn-primary text-xs font-extrabold flex items-center justify-center gap-1.5">
+            <span>Izinkan Akses</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL: DISCONNECT CONFIRMATION                                        -->
+    <!-- ===================================================================== -->
+    <div id="disconnect-modal" class="hidden fixed sm:absolute inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-4">
+      <div class="w-full max-w-[360px] rounded-3xl bg-[#0A0A0A] border border-white/[0.16] p-5 space-y-4">
+        <div class="space-y-1.5">
+          <span class="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">REVOKE OAUTH TOKEN</span>
+          <h3 id="disconnect-modal-title" class="text-sm font-bold text-zinc-100">Putuskan Koneksi Akun?</h3>
+          <p class="text-xs text-zinc-500 leading-relaxed">Token akses terenkripsi akan dihapus. Anda dapat menghubungkan kembali akun kapan saja.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <button type="button" onclick="closeDisconnectModal()" class="py-2.5 px-4 rounded-xl bg-[#141414] border border-hairline text-xs font-semibold text-zinc-300">
+            Batal
+          </button>
+          <button type="button" onclick="confirmDisconnectAccount()" class="py-2.5 px-4 rounded-xl neon-btn-primary font-bold text-xs">
+            Ya, Putuskan
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- APPLICATION LOGIC & INTERACTIVE ANALYTICS ENGINE                        -->
+  <!-- ======================================================================= -->
+  <script>
+    // 1. Clean Monochrome Inline SVG Icons
+    const PLATFORM_SVGS = {
+      tiktok: `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>`,
+      youtube: `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`,
+      instagram: `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4 4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`,
+      x: `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
+      linkedin: `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>`
+    };
+
+    const KPI_ICONS = {
+      views: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`,
+      watchTime: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+      ctr: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59"/></svg>`,
+      likes: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>`,
+      comments: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/></svg>`,
+      shares: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/></svg>`,
+      saves: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"/></svg>`,
+      completion: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+      repost: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3"/></svg>`,
+      reach: `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>`
+    };
+
+    // 2. Strictly Separated Per-Platform & Per-Video Analytics Dataset
+    const PER_PLATFORM_ANALYTICS = {
+      youtube: {
+        id: 'youtube',
+        name: 'YouTube',
+        studioLabel: 'YOUTUBE STUDIO',
+        handle: '@andikadev',
+        followerCount: '128,4 Rb Subscriber',
+        apiLabel: 'YouTube Data API v3',
+        trafficTag: 'YOUTUBE DISCOVERY',
+        channelTimeframes: {
+          '7H': [
+            { label: 'Tayangan', value: '184,2 Rb', delta: '+16,4%' },
+            { label: 'Waktu Tonton', value: '3.420 Jam', delta: '+14,1%' },
+            { label: 'Subscriber', value: '+2.140', delta: '+19,8%' }
+          ],
+          '28H': [
+            { label: 'Tayangan', value: '642,8 Rb', delta: '+22,5%' },
+            { label: 'Waktu Tonton', value: '12.840 Jam', delta: '+18,9%' },
+            { label: 'Subscriber', value: '+8.490', delta: '+24,3%' }
+          ],
+          '90H': [
+            { label: 'Tayangan', value: '1,94 Jt', delta: '+41,2%' },
+            { label: 'Waktu Tonton', value: '38.910 Jam', delta: '+36,7%' },
+            { label: 'Subscriber', value: '+24.600', delta: '+39,0%' }
+          ]
+        },
+        videos: [
+          {
+            id: 'yt-01',
+            title: 'Membangun Sistem Auto-Upload Video ke 4 Medsos dengan Node.js & FFmpeg',
+            publishDate: '25 Nov 2026',
+            timestampOrder: 4,
+            duration: '08:42',
+            aspect: '16:9',
+            sortViews: 214500,
+            sortEngagement: 9.8,
+            inlineStats: [
+              { label: 'Views', value: '214,5 Rb' },
+              { label: 'Likes', value: '16,8 Rb' },
+              { label: 'Komen', value: '1.240' },
+              { label: 'CTR %', value: '9,4%' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Tayangan (Views)', value: '214.520', badge: '+28% vs rata-rata' },
+              { key: 'watchTime', label: 'Waktu Tonton (Jam)', value: '6.410 Jam', badge: '+31% vs rata-rata' },
+              { key: 'watchTime', label: 'Rata-rata Durasi', value: '05:18', badge: '61,0% durasi' },
+              { key: 'ctr', label: 'CTR Tayangan (%)', value: '9,4%', badge: 'Tinggi (Top 10%)' },
+              { key: 'likes', label: 'Suka (Likes)', value: '16.840', badge: '98,9% rasio suka' },
+              { key: 'comments', label: 'Komentar', value: '1.240', badge: '+19% diskusi' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [42100, 86400, 124900, 156200, 181400, 199800, 214520]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [4800, 11200, 18900, 26400, 33100, 38500, 42100]
+            },
+            hookRate: '84%',
+            completionSummary: 'Rata-rata selesai 61% • 05:18 / 08:42',
+            retentionCurve: [100, 84, 76, 71, 67, 63, 58, 52],
+            trafficSources: [
+              { source: 'Fitur Jelajah (Browse)', pct: 44 },
+              { source: 'Penelusuran YouTube', pct: 29 },
+              { source: 'Video Rekomendasi', pct: 19 },
+              { source: 'Eksternal & Langsung', pct: 8 }
+            ]
+          },
+          {
+            id: 'yt-02',
+            title: 'Setup Meja Kerja Minimalis OLED Monochrome 2026 — Desk Tour',
+            publishDate: '21 Nov 2026',
+            timestampOrder: 3,
+            duration: '00:54',
+            aspect: '9:16',
+            sortViews: 186200,
+            sortEngagement: 10.6,
+            inlineStats: [
+              { label: 'Views', value: '186,2 Rb' },
+              { label: 'Likes', value: '18,1 Rb' },
+              { label: 'Komen', value: '890' },
+              { label: 'CTR %', value: '8,8%' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Tayangan (Views)', value: '186.210', badge: '+22% vs rata-rata' },
+              { key: 'watchTime', label: 'Waktu Tonton (Jam)', value: '2.390 Jam', badge: '+18% vs rata-rata' },
+              { key: 'watchTime', label: 'Rata-rata Durasi', value: '00:46', badge: '85,2% durasi' },
+              { key: 'ctr', label: 'CTR Tayangan (%)', value: '8,8%', badge: '82% diputar vs swipe' },
+              { key: 'likes', label: 'Suka (Likes)', value: '18.120', badge: '99,2% rasio suka' },
+              { key: 'comments', label: 'Komentar', value: '890', badge: '+14% interaksi' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [51200, 94800, 128300, 149000, 164500, 176900, 186210]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [6400, 14900, 24100, 32800, 41200, 46800, 51200]
+            },
+            hookRate: '88%',
+            completionSummary: 'Rata-rata selesai 85% • 00:46 / 00:54',
+            retentionCurve: [100, 88, 86, 85, 84, 83, 81, 79],
+            trafficSources: [
+              { source: 'Shorts Feed', pct: 74 },
+              { source: 'Penelusuran YouTube', pct: 13 },
+              { source: 'Halaman Channel', pct: 8 },
+              { source: 'Fitur Jelajah', pct: 5 }
+            ]
+          },
+          {
+            id: 'yt-03',
+            title: '3 Ekstensi VS Code yang Mempercepat Refactoring Backend',
+            publishDate: '16 Nov 2026',
+            timestampOrder: 2,
+            duration: '00:48',
+            aspect: '9:16',
+            sortViews: 142900,
+            sortEngagement: 9.1,
+            inlineStats: [
+              { label: 'Views', value: '142,9 Rb' },
+              { label: 'Likes', value: '11,9 Rb' },
+              { label: 'Komen', value: '640' },
+              { label: 'CTR %', value: '8,1%' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Tayangan (Views)', value: '142.900', badge: '+11% vs rata-rata' },
+              { key: 'watchTime', label: 'Waktu Tonton (Jam)', value: '1.680 Jam', badge: '+9% vs rata-rata' },
+              { key: 'watchTime', label: 'Rata-rata Durasi', value: '00:41', badge: '85,4% durasi' },
+              { key: 'ctr', label: 'CTR Tayangan (%)', value: '8,1%', badge: '79% diputar vs swipe' },
+              { key: 'likes', label: 'Suka (Likes)', value: '11.940', badge: '98,7% rasio suka' },
+              { key: 'comments', label: 'Komentar', value: '640', badge: '+8% diskusi' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [38900, 71400, 96200, 113800, 126400, 135100, 142900]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [4100, 9800, 17200, 24600, 31400, 35900, 38900]
+            },
+            hookRate: '82%',
+            completionSummary: 'Rata-rata selesai 85% • 00:41 / 00:48',
+            retentionCurve: [100, 82, 80, 79, 78, 76, 75, 73],
+            trafficSources: [
+              { source: 'Shorts Feed', pct: 68 },
+              { source: 'Penelusuran YouTube', pct: 18 },
+              { source: 'Video Rekomendasi', pct: 9 },
+              { source: 'Halaman Channel', pct: 5 }
+            ]
+          },
+          {
+            id: 'yt-04',
+            title: 'Arsitektur Queue Worker Redis & BullMQ untuk Skalabilitas Tinggi',
+            publishDate: '10 Nov 2026',
+            timestampOrder: 1,
+            duration: '12:15',
+            aspect: '16:9',
+            sortViews: 99200,
+            sortEngagement: 8.4,
+            inlineStats: [
+              { label: 'Views', value: '99,2 Rb' },
+              { label: 'Likes', value: '7,6 Rb' },
+              { label: 'Komen', value: '512' },
+              { label: 'CTR %', value: '7,9%' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Tayangan (Views)', value: '99.210', badge: '+6% vs rata-rata' },
+              { key: 'watchTime', label: 'Waktu Tonton (Jam)', value: '2.360 Jam', badge: '+12% vs rata-rata' },
+              { key: 'watchTime', label: 'Rata-rata Durasi', value: '07:14', badge: '59,0% durasi' },
+              { key: 'ctr', label: 'CTR Tayangan (%)', value: '7,9%', badge: 'Stabil' },
+              { key: 'likes', label: 'Suka (Likes)', value: '7.620', badge: '99,1% rasio suka' },
+              { key: 'comments', label: 'Komentar', value: '512', badge: '+15% diskusi' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [19400, 39800, 58100, 72400, 83900, 92100, 99210]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [2100, 5400, 9200, 12800, 15900, 17800, 19400]
+            },
+            hookRate: '79%',
+            completionSummary: 'Rata-rata selesai 59% • 07:14 / 12:15',
+            retentionCurve: [100, 79, 71, 66, 62, 58, 54, 49],
+            trafficSources: [
+              { source: 'Penelusuran YouTube', pct: 41 },
+              { source: 'Fitur Jelajah (Browse)', pct: 33 },
+              { source: 'Video Rekomendasi', pct: 18 },
+              { source: 'Eksternal (GitHub/X)', pct: 8 }
+            ]
+          }
+        ]
+      },
+
+      tiktok: {
+        id: 'tiktok',
+        name: 'TikTok',
+        studioLabel: 'TIKTOK STUDIO',
+        handle: '@andika.builds',
+        followerCount: '214,6 Rb Pengikut',
+        apiLabel: 'Content Posting API v2',
+        trafficTag: 'TIKTOK TRAFFIC',
+        channelTimeframes: {
+          '7H': [
+            { label: 'Tayangan Video', value: '312,4 Rb', delta: '+24,8%' },
+            { label: 'Suka', value: '34,1 Rb', delta: '+27,2%' },
+            { label: 'Pengikut', value: '+3.890', delta: '+21,5%' }
+          ],
+          '28H': [
+            { label: 'Tayangan Video', value: '1,18 Jt', delta: '+31,4%' },
+            { label: 'Suka', value: '126,4 Rb', delta: '+29,6%' },
+            { label: 'Pengikut', value: '+14.200', delta: '+26,8%' }
+          ],
+          '90H': [
+            { label: 'Tayangan Video', value: '3,64 Jt', delta: '+48,9%' },
+            { label: 'Suka', value: '389,2 Rb', delta: '+44,1%' },
+            { label: 'Pengikut', value: '+41.800', delta: '+38,4%' }
+          ]
+        },
+        videos: [
+          {
+            id: 'tt-01',
+            title: 'POV: 1 Kali Upload Video Langsung Tayang di 4 Aplikasi Sekaligus',
+            publishDate: '26 Nov 2026',
+            timestampOrder: 4,
+            duration: '00:38',
+            aspect: '9:16',
+            sortViews: 468200,
+            sortEngagement: 12.4,
+            inlineStats: [
+              { label: 'Views', value: '468,2 Rb' },
+              { label: 'Likes', value: '49,4 Rb' },
+              { label: 'Komen', value: '1.840' },
+              { label: 'Saves', value: '8.920' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Tayangan Video', value: '468.240', badge: '+39% vs rata-rata' },
+              { key: 'likes', label: 'Suka (Likes)', value: '49.410', badge: '10,5% like rate' },
+              { key: 'comments', label: 'Komentar', value: '1.840', badge: '+24% diskusi' },
+              { key: 'shares', label: 'Dibagikan (Shares)', value: '6.420', badge: 'Viral boost' },
+              { key: 'saves', label: 'Disimpan (Favorites)', value: '8.920', badge: '+42% bookmark' },
+              { key: 'completion', label: 'Tonton Penuh (%)', value: '44,8%', badge: 'Sangat tinggi' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [142000, 248000, 329000, 384000, 421000, 449000, 468240]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [18400, 42100, 68900, 94200, 118400, 132600, 142000]
+            },
+            hookRate: '91%',
+            completionSummary: 'Tonton penuh 44,8% • Rata-rata 00:31 / 00:38',
+            retentionCurve: [100, 91, 84, 78, 72, 65, 56, 45],
+            trafficSources: [
+              { source: 'For You Page (FYP)', pct: 82 },
+              { source: 'Profil Kreator', pct: 9 },
+              { source: 'Pencarian TikTok', pct: 6 },
+              { source: 'Tab Mengikuti', pct: 3 }
+            ]
+          },
+          {
+            id: 'tt-02',
+            title: 'Minimalist OLED Desk Setup 2026 — Tanpa Kabel Berantakan',
+            publishDate: '22 Nov 2026',
+            timestampOrder: 3,
+            duration: '00:42',
+            aspect: '9:16',
+            sortViews: 342800,
+            sortEngagement: 11.2,
+            inlineStats: [
+              { label: 'Views', value: '342,8 Rb' },
+              { label: 'Likes', value: '33,9 Rb' },
+              { label: 'Komen', value: '1.120' },
+              { label: 'Saves', value: '6.340' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Tayangan Video', value: '342.800', badge: '+26% vs rata-rata' },
+              { key: 'likes', label: 'Suka (Likes)', value: '33.910', badge: '9,9% like rate' },
+              { key: 'comments', label: 'Komentar', value: '1.120', badge: '+16% diskusi' },
+              { key: 'shares', label: 'Dibagikan (Shares)', value: '4.180', badge: '+21% share' },
+              { key: 'saves', label: 'Disimpan (Favorites)', value: '6.340', badge: '+31% bookmark' },
+              { key: 'completion', label: 'Tonton Penuh (%)', value: '41,2%', badge: 'Di atas rata-rata' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [104000, 189000, 246000, 288000, 312000, 330000, 342800]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [14200, 31800, 52400, 71900, 88400, 97600, 104000]
+            },
+            hookRate: '87%',
+            completionSummary: 'Tonton penuh 41,2% • Rata-rata 00:33 / 00:42',
+            retentionCurve: [100, 87, 80, 74, 68, 60, 51, 41],
+            trafficSources: [
+              { source: 'For You Page (FYP)', pct: 79 },
+              { source: 'Pencarian TikTok', pct: 11 },
+              { source: 'Profil Kreator', pct: 7 },
+              { source: 'Tab Mengikuti', pct: 3 }
+            ]
+          },
+          {
+            id: 'tt-03',
+            title: 'Cara Debugging API OAuth 2.0 dalam 30 Detik',
+            publishDate: '17 Nov 2026',
+            timestampOrder: 2,
+            duration: '00:31',
+            aspect: '9:16',
+            sortViews: 219400,
+            sortEngagement: 10.1,
+            inlineStats: [
+              { label: 'Views', value: '219,4 Rb' },
+              { label: 'Likes', value: '19,8 Rb' },
+              { label: 'Komen', value: '680' },
+              { label: 'Saves', value: '4.710' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Tayangan Video', value: '219.400', badge: '+14% vs rata-rata' },
+              { key: 'likes', label: 'Suka (Likes)', value: '19.820', badge: '9,0% like rate' },
+              { key: 'comments', label: 'Komentar', value: '680', badge: '+9% diskusi' },
+              { key: 'shares', label: 'Dibagikan (Shares)', value: '2.490', badge: '+15% share' },
+              { key: 'saves', label: 'Disimpan (Favorites)', value: '4.710', badge: '+28% bookmark' },
+              { key: 'completion', label: 'Tonton Penuh (%)', value: '46,5%', badge: 'Loop tinggi' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [68000, 119000, 156000, 182000, 198000, 210000, 219400]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [9200, 21400, 34800, 46900, 57200, 63800, 68000]
+            },
+            hookRate: '85%',
+            completionSummary: 'Tonton penuh 46,5% • Rata-rata 00:26 / 00:31',
+            retentionCurve: [100, 85, 79, 73, 68, 61, 54, 47],
+            trafficSources: [
+              { source: 'For You Page (FYP)', pct: 76 },
+              { source: 'Pencarian TikTok', pct: 14 },
+              { source: 'Profil Kreator', pct: 6 },
+              { source: 'Tab Mengikuti', pct: 4 }
+            ]
+          },
+          {
+            id: 'tt-04',
+            title: 'Dark Mode UI Design Tips: Kenapa OLED Black Lebih Nyaman',
+            publishDate: '11 Nov 2026',
+            timestampOrder: 1,
+            duration: '00:35',
+            aspect: '9:16',
+            sortViews: 154600,
+            sortEngagement: 9.4,
+            inlineStats: [
+              { label: 'Views', value: '154,6 Rb' },
+              { label: 'Likes', value: '13,2 Rb' },
+              { label: 'Komen', value: '490' },
+              { label: 'Saves', value: '3.180' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Tayangan Video', value: '154.600', badge: '+8% vs rata-rata' },
+              { key: 'likes', label: 'Suka (Likes)', value: '13.240', badge: '8,6% like rate' },
+              { key: 'comments', label: 'Komentar', value: '490', badge: 'Stabil' },
+              { key: 'shares', label: 'Dibagikan (Shares)', value: '1.820', badge: '+11% share' },
+              { key: 'saves', label: 'Disimpan (Favorites)', value: '3.180', badge: '+22% bookmark' },
+              { key: 'completion', label: 'Tonton Penuh (%)', value: '39,4%', badge: 'Stabil' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [49000, 84000, 110000, 129000, 141000, 149000, 154600]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [6800, 15400, 24900, 33800, 41200, 45800, 49000]
+            },
+            hookRate: '83%',
+            completionSummary: 'Tonton penuh 39,4% • Rata-rata 00:27 / 00:35',
+            retentionCurve: [100, 83, 76, 69, 63, 55, 47, 39],
+            trafficSources: [
+              { source: 'For You Page (FYP)', pct: 74 },
+              { source: 'Profil Kreator', pct: 13 },
+              { source: 'Pencarian TikTok', pct: 9 },
+              { source: 'Tab Mengikuti', pct: 4 }
+            ]
+          }
+        ]
+      },
+
+      instagram: {
+        id: 'instagram',
+        name: 'Instagram',
+        studioLabel: 'INSTAGRAM INSIGHTS',
+        handle: '@andika.studio',
+        followerCount: '94,2 Rb Pengikut',
+        apiLabel: 'Meta Graph API v21',
+        trafficTag: 'INSTAGRAM REACH',
+        channelTimeframes: {
+          '7H': [
+            { label: 'Pemutaran Reels', value: '128,6 Rb', delta: '+19,2%' },
+            { label: 'Jangkauan', value: '96,4 Rb', delta: '+17,5%' },
+            { label: 'Disimpan', value: '6.840', delta: '+28,4%' }
+          ],
+          '28H': [
+            { label: 'Pemutaran Reels', value: '486,2 Rb', delta: '+24,1%' },
+            { label: 'Jangkauan', value: '362,9 Rb', delta: '+21,8%' },
+            { label: 'Disimpan', value: '24.910', delta: '+33,6%' }
+          ],
+          '90H': [
+            { label: 'Pemutaran Reels', value: '1,42 Jt', delta: '+37,5%' },
+            { label: 'Jangkauan', value: '1,08 Jt', delta: '+34,2%' },
+            { label: 'Disimpan', value: '71.400', delta: '+45,1%' }
+          ]
+        },
+        videos: [
+          {
+            id: 'ig-01',
+            title: 'Aesthetic Monochrome Workspace Tour — Late Night Coding Session',
+            publishDate: '25 Nov 2026',
+            timestampOrder: 4,
+            duration: '00:36',
+            aspect: '9:16',
+            sortViews: 174800,
+            sortEngagement: 11.5,
+            inlineStats: [
+              { label: 'Reels Play', value: '174,8 Rb' },
+              { label: 'Likes', value: '16,4 Rb' },
+              { label: 'Komen', value: '620' },
+              { label: 'Saves', value: '4.890' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Pemutaran Reels', value: '174.820', badge: '+29% vs rata-rata' },
+              { key: 'reach', label: 'Akun Dijangkau', value: '138.400', badge: '74% non-pengikut' },
+              { key: 'likes', label: 'Suka (Likes)', value: '16.410', badge: '9,4% like rate' },
+              { key: 'comments', label: 'Komentar', value: '620', badge: '+18% interaksi' },
+              { key: 'shares', label: 'Dibagikan (Shares)', value: '3.410', badge: 'DM & Story share' },
+              { key: 'saves', label: 'Disimpan (Saves)', value: '4.890', badge: '+38% simpanan' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [48200, 89400, 118600, 141200, 156800, 167400, 174820]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [6900, 15800, 25400, 33900, 41200, 45600, 48200]
+            },
+            hookRate: '86%',
+            completionSummary: 'Rata-rata tonton 00:30 / 00:36 • 83% retensi',
+            retentionCurve: [100, 86, 81, 77, 73, 68, 62, 55],
+            trafficSources: [
+              { source: 'Tab Reels', pct: 64 },
+              { source: 'Jelajah (Explore)', pct: 21 },
+              { source: 'Beranda Feed', pct: 10 },
+              { source: 'Profil (@andika.studio)', pct: 5 }
+            ]
+          },
+          {
+            id: 'ig-02',
+            title: 'Workflow Otomatisasi Konten Kreator Pakai 1 Dashboard',
+            publishDate: '20 Nov 2026',
+            timestampOrder: 3,
+            duration: '00:44',
+            aspect: '9:16',
+            sortViews: 132400,
+            sortEngagement: 10.3,
+            inlineStats: [
+              { label: 'Reels Play', value: '132,4 Rb' },
+              { label: 'Likes', value: '11,2 Rb' },
+              { label: 'Komen', value: '480' },
+              { label: 'Saves', value: '3.920' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Pemutaran Reels', value: '132.400', badge: '+18% vs rata-rata' },
+              { key: 'reach', label: 'Akun Dijangkau', value: '104.200', badge: '68% non-pengikut' },
+              { key: 'likes', label: 'Suka (Likes)', value: '11.210', badge: '8,5% like rate' },
+              { key: 'comments', label: 'Komentar', value: '480', badge: '+14% interaksi' },
+              { key: 'shares', label: 'Dibagikan (Shares)', value: '2.640', badge: '+22% share' },
+              { key: 'saves', label: 'Disimpan (Saves)', value: '3.920', badge: '+31% simpanan' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [36400, 68200, 91400, 108600, 119800, 127100, 132400]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [5100, 11800, 19200, 25600, 31100, 34400, 36400]
+            },
+            hookRate: '82%',
+            completionSummary: 'Rata-rata tonton 00:35 / 00:44 • 79% retensi',
+            retentionCurve: [100, 82, 76, 71, 67, 62, 56, 49],
+            trafficSources: [
+              { source: 'Tab Reels', pct: 59 },
+              { source: 'Jelajah (Explore)', pct: 24 },
+              { source: 'Beranda Feed', pct: 12 },
+              { source: 'Profil (@andika.studio)', pct: 5 }
+            ]
+          },
+          {
+            id: 'ig-03',
+            title: 'Micro-Interactions & Subtle Neon Glow dalam UI Mobile Modern',
+            publishDate: '14 Nov 2026',
+            timestampOrder: 2,
+            duration: '00:32',
+            aspect: '9:16',
+            sortViews: 98600,
+            sortEngagement: 9.7,
+            inlineStats: [
+              { label: 'Reels Play', value: '98,6 Rb' },
+              { label: 'Likes', value: '8,1 Rb' },
+              { label: 'Komen', value: '310' },
+              { label: 'Saves', value: '2.740' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Pemutaran Reels', value: '98.600', badge: '+11% vs rata-rata' },
+              { key: 'reach', label: 'Akun Dijangkau', value: '78.900', badge: '63% non-pengikut' },
+              { key: 'likes', label: 'Suka (Likes)', value: '8.140', badge: '8,2% like rate' },
+              { key: 'comments', label: 'Komentar', value: '310', badge: '+9% interaksi' },
+              { key: 'shares', label: 'Dibagikan (Shares)', value: '1.780', badge: '+15% share' },
+              { key: 'saves', label: 'Disimpan (Saves)', value: '2.740', badge: '+26% simpanan' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [28100, 51400, 68900, 81200, 89400, 94800, 98600]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [3900, 9100, 14800, 19800, 24100, 26700, 28100]
+            },
+            hookRate: '80%',
+            completionSummary: 'Rata-rata tonton 00:25 / 00:32 • 78% retensi',
+            retentionCurve: [100, 80, 75, 70, 65, 60, 54, 48],
+            trafficSources: [
+              { source: 'Tab Reels', pct: 57 },
+              { source: 'Jelajah (Explore)', pct: 23 },
+              { source: 'Beranda Feed', pct: 14 },
+              { source: 'Profil (@andika.studio)', pct: 6 }
+            ]
+          },
+          {
+            id: 'ig-04',
+            title: 'Behind The Scenes: Render Video 60fps Otomatis di Cloud',
+            publishDate: '08 Nov 2026',
+            timestampOrder: 1,
+            duration: '00:40',
+            aspect: '9:16',
+            sortViews: 80400,
+            sortEngagement: 8.9,
+            inlineStats: [
+              { label: 'Reels Play', value: '80,4 Rb' },
+              { label: 'Likes', value: '6,3 Rb' },
+              { label: 'Komen', value: '245' },
+              { label: 'Saves', value: '1.980' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Pemutaran Reels', value: '80.400', badge: '+6% vs rata-rata' },
+              { key: 'reach', label: 'Akun Dijangkau', value: '64.100', badge: '59% non-pengikut' },
+              { key: 'likes', label: 'Suka (Likes)', value: '6.310', badge: '7,8% like rate' },
+              { key: 'comments', label: 'Komentar', value: '245', badge: 'Stabil' },
+              { key: 'shares', label: 'Dibagikan (Shares)', value: '1.290', badge: '+10% share' },
+              { key: 'saves', label: 'Disimpan (Saves)', value: '1.980', badge: '+19% simpanan' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [22400, 41800, 56200, 66400, 73100, 77400, 80400]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [3100, 7200, 11800, 15900, 19400, 21300, 22400]
+            },
+            hookRate: '78%',
+            completionSummary: 'Rata-rata tonton 00:30 / 00:40 • 75% retensi',
+            retentionCurve: [100, 78, 72, 67, 62, 57, 51, 44],
+            trafficSources: [
+              { source: 'Tab Reels', pct: 55 },
+              { source: 'Beranda Feed', pct: 22 },
+              { source: 'Jelajah (Explore)', pct: 16 },
+              { source: 'Profil (@andika.studio)', pct: 7 }
+            ]
+          }
+        ]
+      },
+
+      x: {
+        id: 'x',
+        name: 'X',
+        studioLabel: 'X MEDIA STUDIO',
+        handle: '@andikadp',
+        followerCount: '48,9 Rb Pengikut',
+        apiLabel: 'X API v2 Chunked',
+        trafficTag: 'X TIMELINE DISCOVERY',
+        channelTimeframes: {
+          '7H': [
+            { label: 'Impresi', value: '94,2 Rb', delta: '+15,8%' },
+            { label: 'Tayangan Media', value: '52,8 Rb', delta: '+18,1%' },
+            { label: 'Interaksi', value: '6.420', delta: '+21,4%' }
+          ],
+          '28H': [
+            { label: 'Impresi', value: '348,6 Rb', delta: '+20,4%' },
+            { label: 'Tayangan Media', value: '194,2 Rb', delta: '+23,7%' },
+            { label: 'Interaksi', value: '22.890', delta: '+25,9%' }
+          ],
+          '90H': [
+            { label: 'Impresi', value: '1,02 Jt', delta: '+34,6%' },
+            { label: 'Tayangan Media', value: '568,4 Rb', delta: '+38,2%' },
+            { label: 'Interaksi', value: '64.100', delta: '+41,0%' }
+          ]
+        },
+        videos: [
+          {
+            id: 'x-01',
+            title: 'Demo singkat NEXUS // POST: 1 klik distribusi video ke YouTube, TikTok, IG & X',
+            publishDate: '26 Nov 2026',
+            timestampOrder: 4,
+            duration: '00:45',
+            aspect: '16:9',
+            sortViews: 128400,
+            sortEngagement: 8.6,
+            inlineStats: [
+              { label: 'Impresi', value: '128,4 Rb' },
+              { label: 'Likes', value: '5,4 Rb' },
+              { label: 'Balasan', value: '412' },
+              { label: 'Repost', value: '1.280' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Impresi', value: '128.420', badge: '+32% vs rata-rata' },
+              { key: 'watchTime', label: 'Tayangan Media', value: '74.810', badge: '58,2% play rate' },
+              { key: 'likes', label: 'Suka (Likes)', value: '5.420', badge: '+27% vs rata-rata' },
+              { key: 'repost', label: 'Repost', value: '1.280', badge: '+35% amplifikasi' },
+              { key: 'comments', label: 'Balasan (Replies)', value: '412', badge: '+19% diskusi' },
+              { key: 'saves', label: 'Bookmark', value: '1.940', badge: '+41% disimpan' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [44200, 74800, 94100, 107600, 116900, 123400, 128420]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [6800, 15200, 24100, 31900, 38400, 41800, 44200]
+            },
+            hookRate: '76%',
+            completionSummary: 'Rata-rata tonton 00:31 / 00:45 • 69% retensi',
+            retentionCurve: [100, 76, 68, 62, 57, 52, 46, 41],
+            trafficSources: [
+              { source: 'Timeline For You', pct: 61 },
+              { source: 'Timeline Following', pct: 22 },
+              { source: 'Profil (@andikadp)', pct: 11 },
+              { source: 'Pencarian & Topik', pct: 6 }
+            ]
+          },
+          {
+            id: 'x-02',
+            title: 'Benchmark kecepatan chunked upload X API v2 vs upload manual',
+            publishDate: '21 Nov 2026',
+            timestampOrder: 3,
+            duration: '00:58',
+            aspect: '16:9',
+            sortViews: 94600,
+            sortEngagement: 7.9,
+            inlineStats: [
+              { label: 'Impresi', value: '94,6 Rb' },
+              { label: 'Likes', value: '3,9 Rb' },
+              { label: 'Balasan', value: '298' },
+              { label: 'Repost', value: '890' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Impresi', value: '94.600', badge: '+19% vs rata-rata' },
+              { key: 'watchTime', label: 'Tayangan Media', value: '52.140', badge: '55,1% play rate' },
+              { key: 'likes', label: 'Suka (Likes)', value: '3.910', badge: '+16% vs rata-rata' },
+              { key: 'repost', label: 'Repost', value: '890', badge: '+22% amplifikasi' },
+              { key: 'comments', label: 'Balasan (Replies)', value: '298', badge: '+14% diskusi' },
+              { key: 'saves', label: 'Bookmark', value: '1.420', badge: '+29% disimpan' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [32400, 54900, 69800, 79600, 86400, 91100, 94600]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [4900, 11200, 17800, 23400, 28100, 30600, 32400]
+            },
+            hookRate: '73%',
+            completionSummary: 'Rata-rata tonton 00:38 / 00:58 • 65% retensi',
+            retentionCurve: [100, 73, 64, 58, 53, 48, 42, 37],
+            trafficSources: [
+              { source: 'Timeline For You', pct: 58 },
+              { source: 'Timeline Following', pct: 25 },
+              { source: 'Profil (@andikadp)', pct: 11 },
+              { source: 'Pencarian & Topik', pct: 6 }
+            ]
+          },
+          {
+            id: 'x-03',
+            title: 'OLED Black UI #000000 untuk aplikasi mobile developer tools',
+            publishDate: '15 Nov 2026',
+            timestampOrder: 2,
+            duration: '00:34',
+            aspect: '9:16',
+            sortViews: 71200,
+            sortEngagement: 7.4,
+            inlineStats: [
+              { label: 'Impresi', value: '71,2 Rb' },
+              { label: 'Likes', value: '2,8 Rb' },
+              { label: 'Balasan', value: '184' },
+              { label: 'Repost', value: '610' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Impresi', value: '71.200', badge: '+11% vs rata-rata' },
+              { key: 'watchTime', label: 'Tayangan Media', value: '39.800', badge: '55,9% play rate' },
+              { key: 'likes', label: 'Suka (Likes)', value: '2.840', badge: '+9% vs rata-rata' },
+              { key: 'repost', label: 'Repost', value: '610', badge: '+14% amplifikasi' },
+              { key: 'comments', label: 'Balasan (Replies)', value: '184', badge: 'Stabil' },
+              { key: 'saves', label: 'Bookmark', value: '980', badge: '+18% disimpan' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [24800, 41600, 52400, 59800, 64900, 68400, 71200]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [3800, 8600, 13400, 17900, 21400, 23400, 24800]
+            },
+            hookRate: '74%',
+            completionSummary: 'Rata-rata tonton 00:23 / 00:34 • 68% retensi',
+            retentionCurve: [100, 74, 66, 60, 55, 50, 44, 38],
+            trafficSources: [
+              { source: 'Timeline For You', pct: 56 },
+              { source: 'Timeline Following', pct: 26 },
+              { source: 'Profil (@andikadp)', pct: 12 },
+              { source: 'Pencarian & Topik', pct: 6 }
+            ]
+          },
+          {
+            id: 'x-04',
+            title: 'Catatan rilis v2.4: Auto-refresh OAuth token tanpa gangguan jadwal',
+            publishDate: '09 Nov 2026',
+            timestampOrder: 1,
+            duration: '00:40',
+            aspect: '16:9',
+            sortViews: 54400,
+            sortEngagement: 6.8,
+            inlineStats: [
+              { label: 'Impresi', value: '54,4 Rb' },
+              { label: 'Likes', value: '2,1 Rb' },
+              { label: 'Balasan', value: '142' },
+              { label: 'Repost', value: '430' }
+            ],
+            kpis: [
+              { key: 'views', label: 'Impresi', value: '54.400', badge: '+5% vs rata-rata' },
+              { key: 'watchTime', label: 'Tayangan Media', value: '27.450', badge: '50,5% play rate' },
+              { key: 'likes', label: 'Suka (Likes)', value: '2.110', badge: 'Stabil' },
+              { key: 'repost', label: 'Repost', value: '430', badge: '+8% amplifikasi' },
+              { key: 'comments', label: 'Balasan (Replies)', value: '142', badge: 'Stabil' },
+              { key: 'saves', label: 'Bookmark', value: '710', badge: '+12% disimpan' }
+            ],
+            growthDaily: {
+              labels: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7'],
+              values: [18900, 31800, 40100, 45800, 49600, 52300, 54400]
+            },
+            growthHourly: {
+              labels: ['02j', '06j', '10j', '14j', '18j', '21j', '24j'],
+              values: [2900, 6400, 10200, 13600, 16200, 17800, 18900]
+            },
+            hookRate: '70%',
+            completionSummary: 'Rata-rata tonton 00:25 / 00:40 • 62% retensi',
+            retentionCurve: [100, 70, 61, 55, 49, 44, 39, 34],
+            trafficSources: [
+              { source: 'Timeline Following', pct: 46 },
+              { source: 'Timeline For You', pct: 37 },
+              { source: 'Profil (@andikadp)', pct: 12 },
+              { source: 'Pencarian & Topik', pct: 5 }
+            ]
+          }
+        ]
+      }
+    };
+
+    // 3. Main Application State (Defaulting to 'analitik' tab)
+    const appState = {
+      activeTab: 'analitik',
+      videoLoaded: false,
+      videoType: null,
+      videoPlaying: true,
+      videoMeta: {
+        name: 'nexus_setup_2026.mp4',
+        resolution: '1080x1920 • 60fps',
+        sizeDuration: '24.8 MB • 00:45'
+      },
+      scheduleMode: 'now',
+      customCaptionsEnabled: false,
+      activeCustomCaptionPlatform: null,
+      customCaptions: {},
+      pendingOAuthPlatformId: null,
+      pendingDisconnectPlatformId: null,
+      queueFilter: 'all',
+      analyticsState: {
+        selectedPlatform: 'youtube',
+        timeframe: '28H',
+        sortBy: 'newest',
+        selectedVideoId: null,
+        chartGranularity: 'daily',
+        activeNodeIndex: 6
+      },
+      platforms: [
+        {
+          id: 'youtube',
+          name: 'YouTube',
+          shortName: 'YouTube',
+          handle: '@andikadev',
+          followers: '128,4 Rb Subscriber',
+          demoConnectHandle: '@andikadev',
+          demoFollowers: '128,4 Rb Subscriber',
+          connected: true,
+          selected: true,
+          apiLabel: 'YouTube Data API v3'
+        },
+        {
+          id: 'tiktok',
+          name: 'TikTok',
+          shortName: 'TikTok',
+          handle: '@andika.builds',
+          followers: '214,6 Rb Pengikut',
+          demoConnectHandle: '@andika.builds',
+          demoFollowers: '214,6 Rb Pengikut',
+          connected: true,
+          selected: true,
+          apiLabel: 'Content Posting API v2'
+        },
+        {
+          id: 'instagram',
+          name: 'Instagram',
+          shortName: 'Instagram',
+          handle: '@andika.studio',
+          followers: '94,2 Rb Pengikut',
+          demoConnectHandle: '@andika.studio',
+          demoFollowers: '94,2 Rb Pengikut',
+          connected: true,
+          selected: true,
+          apiLabel: 'Meta Graph API v21'
+        },
+        {
+          id: 'x',
+          name: 'X (Twitter)',
+          shortName: 'X',
+          handle: '@andikadp',
+          followers: '48,9 Rb Pengikut',
+          demoConnectHandle: '@andikadp',
+          demoFollowers: '48,9 Rb Pengikut',
+          connected: true,
+          selected: true,
+          apiLabel: 'X API v2 Chunked'
+        }
+      ],
+      queueItems: [
+        {
+          id: 'job-204',
+          title: 'Teaser Produk v2.4 — Monochrome Edition',
+          timestamp: 'Baru saja • Worker Aktif',
+          overallStatus: 'PROSES',
+          targets: [
+            { platformId: 'tiktok', status: 'SELESAI', progress: 100, note: 'Tayang • @andika.builds' },
+            { platformId: 'youtube', status: 'PROSES', progress: 74, note: 'Memproses HD (74%)...' },
+            { platformId: 'instagram', status: 'PROSES', progress: 56, note: 'Mengunggah Reels (56%)...' },
+            { platformId: 'x', status: 'SELESAI', progress: 100, note: 'Tayang • @andikadp' }
+          ]
+        },
+        {
+          id: 'job-203',
+          title: 'Setup Meja Kerja Minimalis OLED 2026',
+          timestamp: 'Hari ini • 03:40 WIB',
+          overallStatus: 'GAGAL',
+          targets: [
+            { platformId: 'tiktok', status: 'SELESAI', progress: 100, note: 'Tayang • 342,8 Rb views' },
+            { platformId: 'youtube', status: 'SELESAI', progress: 100, note: 'Tayang • 186,2 Rb views' },
+            { platformId: 'instagram', status: 'GAGAL', progress: 65, note: 'Meta Graph Timeout (504)' }
+          ]
+        },
+        {
+          id: 'job-202',
+          title: 'Tutorial Integrasi API Multi-Platform',
+          timestamp: 'Besok • 19:30 WIB',
+          overallStatus: 'TERJADWAL',
+          targets: [
+            { platformId: 'youtube', status: 'TERJADWAL', progress: 100, note: 'Scheduled via API v3' },
+            { platformId: 'tiktok', status: 'TERJADWAL', progress: 100, note: 'Siap tayang terjadwal' },
+            { platformId: 'instagram', status: 'TERJADWAL', progress: 100, note: 'Container siap tayang' },
+            { platformId: 'x', status: 'TERJADWAL', progress: 100, note: 'Scheduled post aktif' }
+          ]
+        },
+        {
+          id: 'job-201',
+          title: '3 Ekstensi VS Code yang Mempercepat Refactoring Backend',
+          timestamp: 'Kemarin • 20:00 WIB',
+          overallStatus: 'SELESAI',
+          targets: [
+            { platformId: 'youtube', status: 'SELESAI', progress: 100, note: 'Tayang • 142,9 Rb views' },
+            { platformId: 'tiktok', status: 'SELESAI', progress: 100, note: 'Tayang • 219,4 Rb views' },
+            { platformId: 'instagram', status: 'SELESAI', progress: 100, note: 'Tayang • 98,6 Rb plays' },
+            { platformId: 'x', status: 'SELESAI', progress: 100, note: 'Tayang • 71,2 Rb impresi' }
+          ]
+        }
+      ]
+    };
+
+    // 4. Number Formatter (Indonesian Compact Format: Jt, Rb)
+    function formatCompactID(num) {
+      if (num >= 1000000) {
+        return (num / 1000000).toFixed(2).replace('.', ',') + ' Jt'
+      }
+      if (num >= 10000) {
+        return (num / 1000).toFixed(1).replace('.', ',') + ' Rb'
+      }
+      return num.toLocaleString('id-ID')
+    }
+
+    // 5. Initialize App
+    window.addEventListener('DOMContentLoaded', () => {
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      const dateInput = document.getElementById('schedule-date')
+      if (dateInput) {
+        dateInput.value = tomorrow.toISOString().split('T')[0]
+      }
+
+      renderStudioPlatforms()
+      renderAnalyticsScreen()
+      renderQueueList()
+      renderOAuthAccounts()
+      updateHeaderAndCTA()
+      startDemoCanvasLoop()
+      startInitialBackgroundJobSimulation()
+    })
+
+    // 6. Tab Navigation
+    function switchTab(tabName) {
+      appState.activeTab = tabName
+      const tabs = ['studio', 'analitik', 'antrean', 'akun']
+
+      tabs.forEach(t => {
+        const section = document.getElementById(`tab-${t}`)
+        const indicator = document.getElementById(`nav-indicator-${t}`)
+        const icon = document.getElementById(`nav-icon-${t}`)
+        const text = document.getElementById(`nav-text-${t}`)
+
+        if (t === tabName) {
+          section.classList.remove('hidden')
+          indicator.classList.remove('opacity-0')
+          icon.classList.remove('text-zinc-500')
+          icon.classList.add('text-zinc-100', 'neon-icon-subtle')
+          text.classList.remove('text-zinc-500', 'font-medium')
+          text.classList.add('text-zinc-100', 'font-bold', 'neon-text-subtle')
+        } else {
+          section.classList.add('hidden')
+          indicator.classList.add('opacity-0')
+          icon.classList.add('text-zinc-500')
+          icon.classList.remove('text-zinc-100', 'neon-icon-subtle')
+          text.classList.add('text-zinc-500', 'font-medium')
+          text.classList.remove('text-zinc-100', 'font-bold', 'neon-text-subtle')
+        }
+      })
+
+      document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    // 7. Non-blocking Toast Banner
+    function showToast(message) {
+      const container = document.getElementById('toast-container')
+      const toast = document.createElement('div')
+      toast.className = 'px-4 py-2.5 rounded-full bg-[#111111]/95 backdrop-blur-xl border border-white/[0.22] text-xs font-semibold text-zinc-100 neon-halo-soft flex items-center gap-2 transition-all duration-300 transform translate-y-[-8px] opacity-0'
+      toast.innerHTML = `
+        <span class="w-1.5 h-1.5 rounded-full neon-dot-subtle shrink-0"></span>
+        <span>${message}</span>
+      `
+      container.appendChild(toast)
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-[-8px]', 'opacity-0')
+      })
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-[-8px]')
+        setTimeout(() => toast.remove(), 300)
+      }, 2800)
+    }
+
+    // =========================================================================
+    // TAB 1: STUDIO LOGIC
+    // =========================================================================
+    function startDemoCanvasLoop() {
+      const canvas = document.getElementById('demo-video-canvas')
+      if (!canvas) return
+      const ctx = canvas.getContext('2d')
+      let frame = 0
+
+      function renderFrame() {
+        if (appState.videoLoaded && appState.videoType === 'demo' && appState.videoPlaying) {
+          frame += 0.025
+          const w = canvas.width
+          const h = canvas.height
+
+          ctx.fillStyle = '#050505'
+          ctx.fillRect(0, 0, w, h)
+
+          // Subtle monochrome architectural grid
+          ctx.strokeStyle = 'rgba(255, 255, 231, 0.07)'
+          ctx.lineWidth = 1
+          for (let y = 0; y < h; y += 28) {
+            const offset = (frame * 20) % 28
+            ctx.beginPath()
+            ctx.moveTo(0, y + offset)
+            ctx.lineTo(w, y + offset)
+            ctx.stroke()
+          }
+
+          // Subtle concentric rings (15% luminance)
+          const centerX = w / 2
+          const centerY = h / 2 - 14
+          for (let i = 1; i <= 3; i++) {
+            const radius = 24 + i * 20 + Math.sin(frame + i) * 5
+            ctx.beginPath()
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
+            ctx.strokeStyle = `rgba(228, 228, 231, ${0.24 / i})`
+            ctx.lineWidth = i === 1 ? 1.5 : 1
+            ctx.stroke()
+          }
+
+          // Audio waveform bars
+          ctx.fillStyle = '#E4E4E7'
+          const bars = 9
+          const barWidth = 3.5
+          const gap = 5
+          const startX = centerX - ((bars * (barWidth + gap)) - gap) / 2
+          for (let b = 0; b < bars; b++) {
+            const barH = 10 + Math.abs(Math.sin(frame * 2.2 + b * 0.7)) * 30
+            ctx.fillRect(startX + b * (barWidth + gap), centerY - barH / 2, barWidth, barH)
+          }
+
+          // HUD text
+          ctx.fillStyle = 'rgba(228, 228, 231, 0.8)'
+          ctx.font = 'bold 10px "JetBrains Mono", monospace'
+          ctx.fillText('NEXUS // REEL_01', 14, h - 32)
+          ctx.fillStyle = 'rgba(161, 161, 170, 0.65)'
+          ctx.font = '9px "JetBrains Mono", monospace'
+          ctx.fillText('1080x1920 • 60FPS', 14, h - 18)
+        }
+        requestAnimationFrame(renderFrame)
+      }
+      renderFrame()
+    }
+
+    function loadDemoVideo() {
+      appState.videoLoaded = true
+      appState.videoType = 'demo'
+      appState.videoPlaying = true
+      appState.videoMeta = {
+        name: 'nexus_setup_2026.mp4',
+        resolution: '1080x1920 • 60fps',
+        sizeDuration: '24.8 MB • 00:45'
+      }
+
+      document.getElementById('upload-empty-state').classList.add('hidden')
+      document.getElementById('upload-preview-state').classList.remove('hidden')
+      document.getElementById('demo-video-canvas').classList.remove('hidden')
+      document.getElementById('local-video-player').classList.add('hidden')
+
+      document.getElementById('video-filename').textContent = appState.videoMeta.name
+      document.getElementById('video-resolution').textContent = appState.videoMeta.resolution
+      document.getElementById('video-size-duration').textContent = appState.videoMeta.sizeDuration
+
+      const titleInput = document.getElementById('post-title')
+      if (!titleInput.value.trim()) {
+        titleInput.value = 'Minimalist OLED Coding Desk Setup 2026'
+      }
+
+      showToast('Video Demo 9:16 siap dipublikasikan')
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault()
+      document.getElementById('upload-empty-state').classList.add('neon-card-active')
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault()
+      document.getElementById('upload-empty-state').classList.remove('neon-card-active')
+    }
+
+    function handleDropFile(e) {
+      e.preventDefault()
+      document.getElementById('upload-empty-state').classList.remove('neon-card-active')
+      const file = e.dataTransfer.files && e.dataTransfer.files[0]
+      if (file && file.type.startsWith('video/')) {
+        processLocalVideoFile(file)
+      } else {
+        showToast('Silakan pilih file berformat video')
+      }
+    }
+
+    function handleLocalVideoSelect(event) {
+      const file = event.target.files[0]
+      if (file) processLocalVideoFile(file)
+    }
+
+    function processLocalVideoFile(file) {
+      const fileURL = URL.createObjectURL(file)
+      const videoEl = document.getElementById('local-video-player')
+      videoEl.src = fileURL
+
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
+      appState.videoLoaded = true
+      appState.videoType = 'local'
+      appState.videoPlaying = true
+
+      document.getElementById('upload-empty-state').classList.add('hidden')
+      document.getElementById('upload-preview-state').classList.remove('hidden')
+      document.getElementById('demo-video-canvas').classList.add('hidden')
+      videoEl.classList.remove('hidden')
+
+      document.getElementById('video-filename').textContent = file.name
+      document.getElementById('video-resolution').textContent = 'AUTO • 60fps'
+      document.getElementById('video-size-duration').textContent = `${sizeMB} MB • LOCAL`
+
+      videoEl.onloadedmetadata = () => {
+        const mins = Math.floor(videoEl.duration / 60).toString().padStart(2, '0')
+        const secs = Math.floor(videoEl.duration % 60).toString().padStart(2, '0')
+        document.getElementById('video-resolution').textContent = `${videoEl.videoWidth}x${videoEl.videoHeight}`
+        document.getElementById('video-size-duration').textContent = `${sizeMB} MB • ${mins}:${secs}`
+      }
+
+      showToast(`Video "${file.name}" berhasil dimuat`)
+    }
+
+    function togglePreviewPlayback() {
+      appState.videoPlaying = !appState.videoPlaying
+      const playIcon = document.getElementById('preview-play-icon')
+      const videoEl = document.getElementById('local-video-player')
+
+      if (appState.videoType === 'local') {
+        if (appState.videoPlaying) videoEl.play()
+        else videoEl.pause()
+      }
+
+      playIcon.innerHTML = appState.videoPlaying
+        ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'
+        : '<path d="M8 5v14l11-7z"/>'
+    }
+
+    function resetVideoUpload() {
+      appState.videoLoaded = false
+      appState.videoType = null
+      document.getElementById('video-file-input').value = ''
+      document.getElementById('upload-preview-state').classList.add('hidden')
+      document.getElementById('upload-empty-state').classList.remove('hidden')
+    }
+
+    function renderStudioPlatforms() {
+      const grid = document.getElementById('studio-platforms-grid')
+      const connectedPlatforms = appState.platforms.filter(p => p.connected)
+
+      grid.innerHTML = connectedPlatforms.map(p => {
+        const isSelected = p.selected
+        return `
+          <button
+            type="button"
+            onclick="togglePlatformSelection('${p.id}')"
+            class="p-3 rounded-2xl text-left transition-all duration-200 flex items-center justify-between border ${
+              isSelected
+                ? 'bg-[#111111] neon-card-active'
+                : 'bg-[#0A0A0A] border-hairline opacity-60 hover:opacity-90'
+            }"
+          >
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                isSelected ? 'bg-[#E4E4E7] text-[#09090B]' : 'bg-[#151515] text-zinc-400'
+              }">
+                ${PLATFORM_SVGS[p.id]}
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-bold text-zinc-100 truncate ${isSelected ? 'neon-text-subtle' : ''}">${p.shortName}</p>
+                <p class="font-mono text-[10px] text-zinc-500 truncate">${p.handle}</p>
+              </div>
+            </div>
+
+            <div class="w-4 h-4 rounded-full flex items-center justify-center shrink-0 ml-1.5 border ${
+              isSelected ? 'bg-[#E4E4E7] border-[#E4E4E7] text-[#09090B]' : 'border-zinc-700 bg-transparent'
+            }">
+              ${isSelected ? `<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>` : ''}
+            </div>
+          </button>
+        `
+      }).join('')
+
+      if (appState.customCaptionsEnabled) {
+        renderCustomCaptionsTabs()
+      }
+      updateHeaderAndCTA()
+    }
+
+    function togglePlatformSelection(platformId) {
+      const platform = appState.platforms.find(p => p.id === platformId)
+      if (!platform || !platform.connected) return
+      platform.selected = !platform.selected
+      renderStudioPlatforms()
+    }
+
+    function updateCaptionCount() {
+      const val = document.getElementById('post-caption').value
+      document.getElementById('caption-counter').textContent = `${val.length} / 2200`
+    }
+
+    function appendHashtag(tag) {
+      const textarea = document.getElementById('post-caption')
+      const current = textarea.value.trim()
+      if (!current.includes(tag)) {
+        textarea.value = current ? `${current} ${tag}` : tag
+        updateCaptionCount()
+      }
+    }
+
+    function toggleCustomCaptions() {
+      appState.customCaptionsEnabled = !appState.customCaptionsEnabled
+      const toggleBtn = document.getElementById('custom-caption-toggle')
+      const knob = document.getElementById('custom-caption-knob')
+      const container = document.getElementById('custom-captions-container')
+
+      toggleBtn.setAttribute('aria-checked', appState.customCaptionsEnabled)
+
+      if (appState.customCaptionsEnabled) {
+        toggleBtn.classList.remove('bg-[#141414]')
+        toggleBtn.classList.add('bg-[#E4E4E7]')
+        knob.classList.remove('bg-zinc-500')
+        knob.classList.add('bg-[#09090B]', 'translate-x-5')
+        container.classList.remove('hidden')
+        renderCustomCaptionsTabs()
+      } else {
+        toggleBtn.classList.add('bg-[#141414]')
+        toggleBtn.classList.remove('bg-[#E4E4E7]')
+        knob.classList.add('bg-zinc-500')
+        knob.classList.remove('bg-[#09090B]', 'translate-x-5')
+        container.classList.add('hidden')
+      }
+    }
+
+    function selectCustomCaptionTab(platformId) {
+      appState.activeCustomCaptionPlatform = platformId
+      renderCustomCaptionsTabs()
+    }
+
+    function renderCustomCaptionsTabs() {
+      const container = document.getElementById('custom-captions-container')
+      const selectedPlatforms = appState.platforms.filter(p => p.connected && p.selected)
+
+      if (selectedPlatforms.length === 0) {
+        container.innerHTML = `<p class="text-[11px] text-zinc-500 italic">Pilih minimal 1 akun tujuan di atas untuk mengatur caption khusus.</p>`
+        return
+      }
+
+      if (!appState.activeCustomCaptionPlatform || !selectedPlatforms.some(p => p.id === appState.activeCustomCaptionPlatform)) {
+        appState.activeCustomCaptionPlatform = selectedPlatforms[0].id
+      }
+
+      const activePlatform = selectedPlatforms.find(p => p.id === appState.activeCustomCaptionPlatform)
+
+      const tabsHTML = selectedPlatforms.map(p => {
+        const isActive = p.id === activePlatform.id
+        return `
+          <button
+            type="button"
+            onclick="selectCustomCaptionTab('${p.id}')"
+            class="px-2.5 py-1.5 rounded-lg font-mono text-[10px] flex items-center gap-1.5 border transition ${
+              isActive
+                ? 'bg-[#18181B] border-white/25 text-zinc-100 font-bold'
+                : 'bg-[#111111] border-hairline text-zinc-500 hover:text-zinc-300'
+            }"
+          >
+            <span class="w-3 h-3 inline-flex items-center justify-center">${PLATFORM_SVGS[p.id]}</span>
+            <span>${p.shortName}</span>
+          </button>
+        `
+      }).join('')
+
+      container.innerHTML = `
+        <div class="flex flex-wrap gap-1.5">${tabsHTML}</div>
+        <textarea
+          rows="2"
+          oninput="appState.customCaptions['${activePlatform.id}'] = this.value"
+          placeholder="Tulis override caption khusus untuk ${activePlatform.name}..."
+          class="w-full px-3 py-2 rounded-xl bg-[#111111] border border-hairline focus:border-white/30 focus:outline-none text-xs text-zinc-200 placeholder-zinc-600 resize-none"
+        >${appState.customCaptions[activePlatform.id] || ''}</textarea>
+      `
+    }
+
+    function setScheduleMode(mode) {
+      appState.scheduleMode = mode
+      const btnNow = document.getElementById('btn-mode-now')
+      const btnSched = document.getElementById('btn-mode-schedule')
+      const schedInputs = document.getElementById('schedule-inputs')
+
+      if (mode === 'now') {
+        btnNow.className = 'py-2 px-3 rounded-lg text-xs font-bold bg-[#E4E4E7] text-[#09090B] neon-halo-soft transition'
+        btnSched.className = 'py-2 px-3 rounded-lg text-xs font-semibold text-zinc-400 hover:text-zinc-200 transition'
+        schedInputs.classList.add('hidden')
+      } else {
+        btnSched.className = 'py-2 px-3 rounded-lg text-xs font-bold bg-[#E4E4E7] text-[#09090B] neon-halo-soft transition'
+        btnNow.className = 'py-2 px-3 rounded-lg text-xs font-semibold text-zinc-400 hover:text-zinc-200 transition'
+        schedInputs.classList.remove('hidden')
+      }
+      updateHeaderAndCTA()
+    }
+
+    function updateHeaderAndCTA() {
+      const connectedCount = appState.platforms.filter(p => p.connected).length
+      const selectedCount = appState.platforms.filter(p => p.connected && p.selected).length
+
+      document.getElementById('header-active-count').textContent = `${connectedCount} AKUN AKTIF`
+
+      const ctaBtn = document.getElementById('btn-publish-cta')
+      const ctaLabel = document.getElementById('cta-label')
+
+      if (selectedCount === 0) {
+        ctaBtn.disabled = true
+        ctaLabel.textContent = 'Pilih Minimal 1 Platform'
+      } else {
+        ctaBtn.disabled = false
+        const actionWord = appState.scheduleMode === 'now' ? 'Publikasikan ke' : 'Jadwalkan ke'
+        ctaLabel.textContent = `${actionWord} ${selectedCount} Platform`
+      }
+    }
+
+    function handlePublishSubmit() {
+      const selectedPlatforms = appState.platforms.filter(p => p.connected && p.selected)
+      if (selectedPlatforms.length === 0) {
+        showToast('Pilih minimal 1 akun platform tujuan')
+        return
+      }
+
+      if (!appState.videoLoaded) {
+        loadDemoVideo()
+      }
+
+      const titleInput = document.getElementById('post-title').value.trim()
+      const jobTitle = titleInput || 'Minimalist OLED Coding Desk Setup 2026'
+      const isScheduled = appState.scheduleMode === 'schedule'
+      const schedDate = document.getElementById('schedule-date').value
+      const schedTime = document.getElementById('schedule-time').value
+
+      const newJob = {
+        id: 'job-' + Date.now(),
+        title: jobTitle,
+        timestamp: isScheduled ? `Jadwal • ${schedDate} (${schedTime} WIB)` : 'Baru saja • Worker Aktif',
+        overallStatus: 'PROSES',
+        isScheduledJob: isScheduled,
+        targets: selectedPlatforms.map(p => ({
+          platformId: p.id,
+          status: 'PROSES',
+          progress: 12,
+          note: 'Mengunggah ke Cloud Storage...'
+        }))
+      }
+
+      appState.queueItems.unshift(newJob)
+      appState.queueFilter = 'all'
+      renderQueueList()
+      switchTab('antrean')
+      document.getElementById('nav-queue-dot').classList.remove('hidden')
+      showToast(`Memulai distribusi ke ${selectedPlatforms.length} platform...`)
+
+      runJobProgressSimulation(newJob, schedTime)
+    }
+
+    function runJobProgressSimulation(job, schedTime = '19:30') {
+      job.targets.forEach((target, idx) => {
+        if (target.progress >= 100) return
+        const speedMultiplier = 0.9 + idx * 0.25
+        const interval = setInterval(() => {
+          if (target.progress < 100) {
+            const step = Math.floor(Math.random() * 14 + 9) / speedMultiplier
+            target.progress = Math.min(100, Math.round(target.progress + step))
+
+            if (target.progress < 45) {
+              target.note = `Mengunggah media (${target.progress}%)...`
+            } else if (target.progress < 90) {
+              target.note = `Memproses API (${target.progress}%)...`
+            } else if (target.progress < 100) {
+              target.note = 'Finalisasi metadata...'
+            } else {
+              target.status = job.isScheduledJob ? 'TERJADWAL' : 'SELESAI'
+              target.note = job.isScheduledJob ? `Terjadwal • ${schedTime} WIB` : 'Tayang • Live sekarang'
+              clearInterval(interval)
+
+              const allDone = job.targets.every(t => t.progress >= 100)
+              if (allDone) {
+                job.overallStatus = job.isScheduledJob ? 'TERJADWAL' : 'SELESAI'
+                const anyStillProcessing = appState.queueItems.some(j => j.overallStatus === 'PROSES')
+                if (!anyStillProcessing) {
+                  document.getElementById('nav-queue-dot').classList.add('hidden')
+                }
+                showToast(job.isScheduledJob ? 'Semua platform berhasil dijadwalkan!' : 'Semua video berhasil tayang!')
+              }
+            }
+            renderQueueList()
+          }
+        }, 420)
+      })
+    }
+
+    function startInitialBackgroundJobSimulation() {
+      const initialLiveJob = appState.queueItems.find(j => j.overallStatus === 'PROSES')
+      if (initialLiveJob) {
+        document.getElementById('nav-queue-dot').classList.remove('hidden')
+        runJobProgressSimulation(initialLiveJob)
+      }
+    }
+
+    // =========================================================================
+    // TAB 2: SEPARATED PER-PLATFORM & PER-CONTENT ANALYTICS ENGINE
+    // =========================================================================
+    function renderAnalyticsScreen() {
+      const { selectedVideoId } = appState.analyticsState
+      const platformView = document.getElementById('analytics-platform-view')
+      const detailView = document.getElementById('analytics-video-detail-view')
+
+      if (selectedVideoId) {
+        platformView.classList.add('hidden')
+        detailView.classList.remove('hidden')
+        renderSingleVideoDeepDive()
+      } else {
+        detailView.classList.add('hidden')
+        platformView.classList.remove('hidden')
+        renderPlatformSwitcherTabs()
+        renderPlatformChannelOverview()
+        renderPlatformVideosList()
+      }
+    }
+
+    function selectAnalyticsPlatform(platformId) {
+      appState.analyticsState.selectedPlatform = platformId
+      appState.analyticsState.selectedVideoId = null
+      appState.analyticsState.activeNodeIndex = 6
+      renderAnalyticsScreen()
+    }
+
+    function setChannelTimeframe(tf) {
+      appState.analyticsState.timeframe = tf
+      renderPlatformChannelOverview()
+    }
+
+    function setVideoSortOrder(sortKey) {
+      appState.analyticsState.sortBy = sortKey
+      ['newest', 'views', 'engagement'].forEach(key => {
+        const btn = document.getElementById(`sort-${key}`)
+        if (key === sortKey) {
+          btn.className = 'py-1.5 px-2 rounded-lg font-mono text-[10px] font-bold bg-[#E4E4E7] text-[#09090B] transition'
+        } else {
+          btn.className = 'py-1.5 px-2 rounded-lg font-mono text-[10px] font-semibold text-zinc-400 hover:text-zinc-200 transition'
+        }
+      })
+      renderPlatformVideosList()
+    }
+
+    function renderPlatformSwitcherTabs() {
+      const container = document.getElementById('analytics-platform-tabs')
+      const selectedId = appState.analyticsState.selectedPlatform
+      const pData = PER_PLATFORM_ANALYTICS[selectedId]
+
+      document.getElementById('analytics-platform-badge').textContent = pData.studioLabel
+
+      const order = ['youtube', 'tiktok', 'instagram', 'x']
+      container.innerHTML = order.map(pid => {
+        const item = PER_PLATFORM_ANALYTICS[pid]
+        const isActive = pid === selectedId
+        return `
+          <button
+            type="button"
+            onclick="selectAnalyticsPlatform('${pid}')"
+            class="p-2.5 rounded-2xl border text-left transition flex flex-col items-center justify-center gap-1 ${
+              isActive ? 'bg-[#111114] neon-card-active' : 'bg-[#0A0A0C] border-hairline opacity-65 hover:opacity-100'
+            }"
+          >
+            <div class="w-7 h-7 rounded-xl flex items-center justify-center ${
+              isActive ? 'bg-[#E4E4E7] text-[#09090B]' : 'bg-[#141418] text-zinc-400'
+            }">
+              ${PLATFORM_SVGS[pid]}
+            </div>
+            <span class="text-[11px] font-bold ${isActive ? 'text-zinc-100 neon-text-subtle' : 'text-zinc-400'}">${item.name}</span>
+            <span class="font-mono text-[9px] text-zinc-500 truncate max-w-full">${item.handle}</span>
+          </button>
+        `
+      }).join('')
+    }
+
+    function renderPlatformChannelOverview() {
+      const card = document.getElementById('analytics-channel-card')
+      const { selectedPlatform, timeframe } = appState.analyticsState
+      const pData = PER_PLATFORM_ANALYTICS[selectedPlatform]
+      const liveAccount = appState.platforms.find(p => p.id === selectedPlatform)
+      const isOAuthConnected = liveAccount ? liveAccount.connected : true
+      const metrics = pData.channelTimeframes[timeframe]
+
+      const tfButtons = ['7H', '28H', '90H'].map(tf => {
+        const active = tf === timeframe
+        return `
+          <button
+            type="button"
+            onclick="setChannelTimeframe('${tf}')"
+            class="px-2 py-1 rounded-lg font-mono text-[10px] transition ${
+              active ? 'bg-[#E4E4E7] text-[#09090B] font-bold' : 'text-zinc-400 hover:text-zinc-200 font-semibold'
+            }"
+          >
+            ${tf}
+          </button>
+        `
+      }).join('')
+
+      const summaryColumns = metrics.map(m => `
+        <div class="p-2.5 rounded-xl bg-[#111114] border border-hairline space-y-1">
+          <span class="text-[10px] text-zinc-400 block truncate">${m.label}</span>
+          <span class="text-sm font-extrabold text-zinc-100 neon-text-subtle block">${m.value}</span>
+          <span class="inline-block font-mono text-[9px] px-1.5 py-0.5 rounded bg-[#18181D] text-zinc-300">${m.delta}</span>
+        </div>
+      `).join('')
+
+      card.innerHTML = `
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-10 h-10 rounded-2xl bg-[#111114] border border-white/[0.15] flex items-center justify-center text-zinc-100 shrink-0 neon-halo-soft">
+              ${PLATFORM_SVGS[selectedPlatform]}
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <h3 class="text-sm font-bold text-zinc-100 truncate">${pData.name}</h3>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#111114] border border-hairline font-mono text-[9px] text-zinc-300">
+                  <span class="w-1.5 h-1.5 rounded-full ${isOAuthConnected ? 'neon-dot-subtle animate-subtle-pulse' : 'bg-zinc-600'}"></span>
+                  ${isOAuthConnected ? 'OAUTH AKTIF' : 'TERPUTUS'}
+                </span>
+              </div>
+              <p class="font-mono text-[11px] text-zinc-400 truncate mt-0.5">${pData.handle} • <span class="text-zinc-300 font-semibold">${pData.followerCount}</span></p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-0.5 p-1 rounded-xl bg-[#111114] border border-hairline shrink-0">
+            ${tfButtons}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 pt-0.5">
+          ${summaryColumns}
+        </div>
+      `
+    }
+
+    function renderPlatformVideosList() {
+      const { selectedPlatform, sortBy } = appState.analyticsState
+      const pData = PER_PLATFORM_ANALYTICS[selectedPlatform]
+
+      document.getElementById('platform-videos-heading').textContent = `Semua Konten ${pData.name}`
+      document.getElementById('platform-videos-count').textContent = `${pData.videos.length} VIDEO`
+
+      const sortedVideos = [...pData.videos].sort((a, b) => {
+        if (sortBy === 'views') return b.sortViews - a.sortViews
+        if (sortBy === 'engagement') return b.sortEngagement - a.sortEngagement
+        return b.timestampOrder - a.timestampOrder
+      })
+
+      const listContainer = document.getElementById('platform-videos-list')
+      listContainer.innerHTML = sortedVideos.map((vid, idx) => {
+        const isWide = vid.aspect === '16:9'
+        const statsHTML = vid.inlineStats.map(st => `
+          <div>
+            <span class="font-mono text-[8px] text-zinc-500 uppercase block">${st.label}</span>
+            <span class="font-mono text-[11px] font-bold text-zinc-200">${st.value}</span>
+          </div>
+        `).join('')
+
+        return `
+          <button
+            type="button"
+            onclick="openSingleVideoAnalytics('${vid.id}')"
+            class="w-full text-left rounded-2xl bg-[#0A0A0C] border border-hairline hover:border-white/[0.24] p-3.5 space-y-3 transition active:scale-[0.99]"
+          >
+            <div class="flex gap-3 items-start">
+              <!-- Stylized Monochrome Thumbnail Preview (9:16 or 16:9) -->
+              <div class="relative ${isWide ? 'w-[104px] h-[62px]' : 'w-[64px] h-[94px]'} rounded-xl bg-[#111114] border border-white/[0.12] shrink-0 overflow-hidden flex flex-col justify-between p-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono text-[8px] px-1 rounded bg-black/85 text-zinc-300">${vid.aspect}</span>
+                  <span class="font-mono text-[8px] text-zinc-500">#0${idx + 1}</span>
+                </div>
+
+                <!-- Minimalist Monochrome Waveform Motif -->
+                <div class="flex items-end justify-center gap-[2px] h-5 opacity-70">
+                  <span class="w-[2px] h-2.5 bg-zinc-500 rounded-full"></span>
+                  <span class="w-[2px] h-4 bg-zinc-200 rounded-full"></span>
+                  <span class="w-[2px] h-3 bg-zinc-400 rounded-full"></span>
+                  <span class="w-[2px] h-5 bg-zinc-100 rounded-full"></span>
+                  <span class="w-[2px] h-2.5 bg-zinc-500 rounded-full"></span>
+                </div>
+
+                <span class="font-mono text-[8px] text-center bg-black/85 rounded py-0.5 text-zinc-200">${vid.duration}</span>
+              </div>
+
+              <!-- Title, Date & Open Cue -->
+              <div class="flex-1 min-w-0 space-y-1.5">
+                <h4 class="text-xs font-bold text-zinc-100 line-clamp-2 leading-snug">${vid.title}</h4>
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-mono text-[10px] text-zinc-500">${vid.publishDate}</span>
+                  <span class="font-mono text-[10px] font-semibold text-zinc-300">Detail →</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Platform-Native Inline Stats Row -->
+            <div class="grid grid-cols-4 gap-1.5 pt-2.5 border-t border-hairline">
+              ${statsHTML}
+            </div>
+          </button>
+        `
+      }).join('')
+    }
+
+    // Open Dedicated Single-Video Deep-Dive Analytics Screen
+    function openSingleVideoAnalytics(videoId) {
+      appState.analyticsState.selectedVideoId = videoId
+      appState.analyticsState.chartGranularity = 'daily'
+      appState.analyticsState.activeNodeIndex = 6
+      renderAnalyticsScreen()
+      document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    function closeSingleVideoAnalytics() {
+      appState.analyticsState.selectedVideoId = null
+      renderAnalyticsScreen()
+      document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    function setVideoChartGranularity(granularity) {
+      appState.analyticsState.chartGranularity = granularity
+      appState.analyticsState.activeNodeIndex = 6
+      ['hourly', 'daily'].forEach(g => {
+        const btn = document.getElementById(`vcg-${g}`)
+        if (g === granularity) {
+          btn.className = 'px-2 py-1 rounded-lg font-mono text-[10px] font-bold bg-[#E4E4E7] text-[#09090B] transition'
+        } else {
+          btn.className = 'px-2 py-1 rounded-lg font-mono text-[10px] font-semibold text-zinc-400 hover:text-zinc-200 transition'
+        }
+      })
+      renderSingleVideoGrowthChart()
+    }
+
+    function renderSingleVideoDeepDive() {
+      const { selectedPlatform, selectedVideoId } = appState.analyticsState
+      const pData = PER_PLATFORM_ANALYTICS[selectedPlatform]
+      const video = pData.videos.find(v => v.id === selectedVideoId)
+      if (!video) return
+
+      // 1. Back button & Platform pill
+      document.getElementById('back-button-label').textContent = `← Semua Video ${pData.name}`
+      document.getElementById('single-video-platform-pill').innerHTML = `
+        <span class="w-3.5 h-3.5 inline-flex items-center justify-center text-zinc-200">${PLATFORM_SVGS[selectedPlatform]}</span>
+        <span>${pData.handle}</span>
+      `
+
+      // 2. Single-Video Preview Header Card
+      const isWide = video.aspect === '16:9'
+      document.getElementById('single-video-header-card').innerHTML = `
+        <div class="flex gap-3.5 items-center">
+          <div class="relative ${isWide ? 'w-[112px] h-[68px]' : 'w-[68px] h-[102px]'} rounded-xl bg-[#111114] border border-white/[0.16] shrink-0 overflow-hidden flex flex-col justify-between p-1.5">
+            <span class="font-mono text-[8px] px-1 rounded bg-black/85 text-zinc-300 self-start">${video.aspect}</span>
+            <div class="flex items-end justify-center gap-[2px] h-5 opacity-80">
+              <span class="w-[2px] h-3 bg-zinc-400 rounded-full"></span>
+              <span class="w-[2px] h-5 bg-zinc-100 rounded-full"></span>
+              <span class="w-[2px] h-3.5 bg-zinc-300 rounded-full"></span>
+              <span class="w-[2px] h-5 bg-zinc-100 rounded-full"></span>
+              <span class="w-[2px] h-2.5 bg-zinc-500 rounded-full"></span>
+            </div>
+            <span class="font-mono text-[8px] text-center bg-black/85 rounded py-0.5 text-zinc-200">${video.duration}</span>
+          </div>
+
+          <div class="flex-1 min-w-0 space-y-1.5">
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#111114] border border-hairline font-mono text-[9px] text-zinc-300">
+              <span class="w-1.5 h-1.5 rounded-full neon-dot-subtle"></span> PUBLIKASI ${video.publishDate.toUpperCase()}
+            </span>
+            <h3 class="text-xs font-bold text-zinc-100 leading-snug">${video.title}</h3>
+            <p class="font-mono text-[10px] text-zinc-500">Durasi ${video.duration} • Format ${video.aspect}</p>
+          </div>
+        </div>
+      `
+
+      // 3. 6 Platform-Native KPI Cards (2x3 Grid)
+      document.getElementById('single-video-kpi-subtitle').textContent = `${pData.name.toUpperCase()} NATIVE KPI`
+      document.getElementById('single-video-kpi-grid').innerHTML = video.kpis.map(kpi => `
+        <div class="rounded-2xl bg-[#0A0A0C] border border-hairline p-3.5 space-y-2">
+          <div class="flex items-center justify-between gap-1 text-zinc-400">
+            <span class="text-[11px] font-medium truncate">${kpi.label}</span>
+            <span class="w-6 h-6 rounded-lg bg-[#111114] border border-hairline flex items-center justify-center text-zinc-300 shrink-0">
+              ${KPI_ICONS[kpi.key] || KPI_ICONS.views}
+            </span>
+          </div>
+          <div class="text-base font-extrabold tracking-tight text-zinc-100 neon-text-subtle">
+            ${kpi.value}
+          </div>
+          <span class="inline-block font-mono text-[9px] px-1.5 py-0.5 rounded bg-[#111114] border border-hairline text-zinc-400">
+            ${kpi.badge}
+          </span>
+        </div>
+      `).join('')
+
+      // 4. Interactive Growth Chart
+      renderSingleVideoGrowthChart()
+
+      // 5. Audience Retention Curve (SVG)
+      document.getElementById('sv-retention-summary').textContent = video.completionSummary
+      document.getElementById('sv-hook-badge').textContent = `Hook 3d: ${video.hookRate}`
+      renderSingleVideoRetentionCurve(video)
+
+      // 6. Platform-Specific Traffic Sources Breakdown
+      document.getElementById('sv-traffic-platform-tag').textContent = pData.trafficTag
+      document.getElementById('single-video-traffic-list').innerHTML = video.trafficSources.map((src, i) => `
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-zinc-300 font-medium">${src.source}</span>
+            <span class="font-mono text-[11px] font-bold text-zinc-100">${src.pct}%</span>
+          </div>
+          <div class="w-full h-1.5 rounded-full bg-[#111114] overflow-hidden border border-hairline">
+            <div
+              class="h-full rounded-full ${i === 0 ? 'bg-[#E4E4E7] neon-halo-soft' : i === 1 ? 'bg-zinc-400' : 'bg-zinc-600'}"
+              style="width: ${src.pct}%"
+            ></div>
+          </div>
+        </div>
+      `).join('')
+    }
+
+    function renderSingleVideoGrowthChart() {
+      const { selectedPlatform, selectedVideoId, chartGranularity, activeNodeIndex } = appState.analyticsState
+      const pData = PER_PLATFORM_ANALYTICS[selectedPlatform]
+      const video = pData.videos.find(v => v.id === selectedVideoId)
+      if (!video) return
+
+      const dataset = chartGranularity === 'hourly' ? video.growthHourly : video.growthDaily
+      const wrapper = document.getElementById('single-video-growth-chart')
+
+      const svgW = 350
+      const svgH = 152
+      const padL = 10
+      const padR = 10
+      const padT = 26
+      const padB = 22
+      const plotW = svgW - padL - padR
+      const plotH = svgH - padT - padB
+
+      const minVal = Math.min(...dataset.values) * 0.85
+      const maxVal = Math.max(...dataset.values) * 1.05
+      const range = maxVal - minVal || 1
+
+      const points = dataset.values.map((val, idx) => {
+        const x = padL + (idx / (dataset.values.length - 1)) * plotW
+        const y = padT + plotH - ((val - minVal) / range) * plotH
+        return { x, y, val, label: dataset.labels[idx] }
+      })
+
+      const linePath = points.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`).join(' ')
+      const areaPath = `${linePath} L ${points[points.length - 1].x.toFixed(1)} ${(padT + plotH).toFixed(1)} L ${points[0].x.toFixed(1)} ${(padT + plotH).toFixed(1)} Z`
+
+      const gridLines = [0, 0.5, 1].map(ratio => {
+        const y = padT + plotH * ratio
+        return `<line x1="${padL}" y1="${y}" x2="${svgW - padR}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3 3" />`
+      }).join('')
+
+      const xLabels = points.map(pt => `
+        <text x="${pt.x.toFixed(1)}" y="${svgH - 4}" text-anchor="middle" fill="#71717A" fontSize="9" fontFamily="JetBrains Mono, monospace">${pt.label}</text>
+      `).join('')
+
+      const metricUnit = selectedPlatform === 'x' ? 'Impresi' : selectedPlatform === 'instagram' ? 'Plays' : 'Views'
+
+      const nodesHTML = points.map((pt, idx) => {
+        const formatted = `${formatCompactID(pt.val)} ${metricUnit}`
+        const isCurrent = idx === activeNodeIndex
+        return `
+          <g class="cursor-pointer" onclick="activateVideoChartNode(${idx}, '${pt.label}', '${formatted}')" onmouseenter="activateVideoChartNode(${idx}, '${pt.label}', '${formatted}')">
+            <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="14" fill="transparent" />
+            <circle
+              id="vchart-node-${idx}"
+              cx="${pt.x.toFixed(1)}"
+              cy="${pt.y.toFixed(1)}"
+              r="${isCurrent ? '4.5' : '3'}"
+              fill="${isCurrent ? '#E4E4E7' : '#0A0A0C'}"
+              stroke="#E4E4E7"
+              stroke-width="1.8"
+            />
+          </g>
+        `
+      }).join('')
+
+      wrapper.innerHTML = `
+        <svg viewBox="0 0 ${svgW} ${svgH}" class="w-full h-full overflow-visible">
+          <defs>
+            <linearGradient id="singleVideoAreaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(255, 255, 255, 0.14)" />
+              <stop offset="100%" stop-color="rgba(255, 255, 255, 0.0)" />
+            </linearGradient>
+          </defs>
+          ${gridLines}
+          <path d="${areaPath}" fill="url(#singleVideoAreaGrad)" />
+          <path
+            d="${linePath}"
+            fill="none"
+            stroke="#E4E4E7"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.16));"
+          />
+          ${xLabels}
+          ${nodesHTML}
+        </svg>
+      `
+
+      const safeIdx = Math.min(activeNodeIndex, points.length - 1)
+      const activePt = points[safeIdx]
+      activateVideoChartNode(safeIdx, activePt.label, `${formatCompactID(activePt.val)} ${metricUnit}`)
+    }
+
+    function activateVideoChartNode(idx, labelStr, valueStr) {
+      appState.analyticsState.activeNodeIndex = idx
+      document.getElementById('vct-label').textContent = labelStr
+      document.getElementById('vct-value').textContent = valueStr
+
+      for (let i = 0; i < 7; i++) {
+        const node = document.getElementById(`vchart-node-${i}`)
+        if (node) {
+          node.setAttribute('r', i === idx ? '4.5' : '3')
+          node.setAttribute('fill', i === idx ? '#E4E4E7' : '#0A0A0C')
+        }
+      }
+    }
+
+    function renderSingleVideoRetentionCurve(video) {
+      const wrapper = document.getElementById('single-video-retention-svg')
+      const pts = video.retentionCurve
+      const w = 350
+      const h = 90
+      const padL = 26
+      const padR = 10
+      const padT = 10
+      const padB = 18
+      const plotW = w - padL - padR
+      const plotH = h - padT - padB
+
+      const coords = pts.map((val, i) => {
+        const x = padL + (i / (pts.length - 1)) * plotW
+        const y = padT + plotH - (val / 100) * plotH
+        return { x, y, val }
+      })
+
+      const linePath = coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`).join(' ')
+      const areaPath = `${linePath} L ${coords[coords.length - 1].x.toFixed(1)} ${(padT + plotH).toFixed(1)} L ${coords[0].x.toFixed(1)} ${(padT + plotH).toFixed(1)} Z`
+      const hookX = coords[1].x
+
+      wrapper.innerHTML = `
+        <svg viewBox="0 0 ${w} ${h}" class="w-full h-full">
+          <defs>
+            <linearGradient id="svRetentionGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(255, 255, 255, 0.13)" />
+              <stop offset="100%" stop-color="rgba(255, 255, 255, 0.0)" />
+            </linearGradient>
+          </defs>
+          <text x="0" y="${padT + 4}" fill="#71717A" fontSize="8" fontFamily="JetBrains Mono">100%</text>
+          <text x="4" y="${padT + plotH / 2 + 3}" fill="#71717A" fontSize="8" fontFamily="JetBrains Mono">50%</text>
+          <line x1="${padL}" y1="${padT + plotH / 2}" x2="${w - padR}" y2="${padT + plotH / 2}" stroke="rgba(255,255,255,0.06)" stroke-dasharray="2 2" />
+          <line x1="${hookX}" y1="${padT}" x2="${hookX}" y2="${padT + plotH}" stroke="rgba(255,255,255,0.22)" stroke-dasharray="2 2" />
+          <path d="${areaPath}" fill="url(#svRetentionGrad)" />
+          <path d="${linePath}" fill="none" stroke="#E4E4E7" strokeWidth="1.9" strokeLineCap="round" style="filter: drop-shadow(0 0 4px rgba(255,255,255,0.14));" />
+          <circle cx="${coords[1].x}" cy="${coords[1].y}" r="3.5" fill="#E4E4E7" />
+          <text x="${padL}" y="${h - 3}" fill="#71717A" fontSize="8" fontFamily="JetBrains Mono">0:00</text>
+          <text x="${hookX}" y="${h - 3}" textAnchor="middle" fill="#E4E4E7" fontSize="8" fontFamily="JetBrains Mono">0:03 Hook (${video.hookRate})</text>
+          <text x="${w - padR}" y="${h - 3}" textAnchor="end" fill="#71717A" fontSize="8" fontFamily="JetBrains Mono">${video.duration}</text>
+        </svg>
+      `
+    }
+
+    // =========================================================================
+    // TAB 3: ANTREAN LOGIC
+    // =========================================================================
+    function setQueueFilter(filter) {
+      appState.queueFilter = filter
+      ['all', 'proses', 'selesai', 'gagal'].forEach(f => {
+        const btn = document.getElementById(`qf-${f}`)
+        if (f === filter) {
+          btn.className = 'py-1.5 rounded-lg font-mono text-[10px] font-bold bg-[#E4E4E7] text-[#09090B] transition'
+        } else {
+          btn.className = 'py-1.5 rounded-lg font-mono text-[10px] font-semibold text-zinc-400 hover:text-zinc-200 transition'
+        }
+      })
+      renderQueueList()
+    }
+
+    function renderQueueList() {
+      const container = document.getElementById('queue-list-container')
+      document.getElementById('queue-total-badge').textContent = `${appState.queueItems.length} TUGAS`
+
+      const f = appState.queueFilter
+      const filtered = appState.queueItems.filter(job => {
+        if (f === 'all') return true
+        if (f === 'proses') return job.overallStatus === 'PROSES' || job.overallStatus === 'TERJADWAL'
+        if (f === 'selesai') return job.overallStatus === 'SELESAI'
+        if (f === 'gagal') return job.overallStatus === 'GAGAL'
+        return true
+      })
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="rounded-2xl bg-[#0A0A0A] border border-hairline p-8 text-center">
+            <p class="text-xs font-semibold text-zinc-400">Tidak ada tugas pada filter ini</p>
+          </div>
+        `
+        return
+      }
+
+      container.innerHTML = filtered.map(job => {
+        let badge = ''
+        if (job.overallStatus === 'PROSES') {
+          badge = `<span class="px-2 py-0.5 rounded-md bg-[#E4E4E7] text-[#09090B] font-mono text-[10px] font-extrabold">MEMPROSES</span>`
+        } else if (job.overallStatus === 'SELESAI') {
+          badge = `<span class="px-2 py-0.5 rounded-md bg-[#141414] border border-white/[0.16] font-mono text-[10px] font-bold text-zinc-200">SELESAI</span>`
+        } else if (job.overallStatus === 'TERJADWAL') {
+          badge = `<span class="px-2 py-0.5 rounded-md bg-[#141414] border border-hairline font-mono text-[10px] font-semibold text-zinc-300">TERJADWAL</span>`
+        } else {
+          badge = `<span class="px-2 py-0.5 rounded-md bg-black border border-dashed border-white/30 font-mono text-[10px] font-bold text-zinc-200">GAGAL SEBAGIAN</span>`
+        }
+
+        const targetsHTML = job.targets.map(t => {
+          const platform = appState.platforms.find(p => p.id === t.platformId)
+          const pName = platform ? platform.shortName : t.platformId
+          const isFailed = t.status === 'GAGAL'
+          const isProcessing = t.status === 'PROSES'
+
+          return `
+            <div class="p-2.5 rounded-xl bg-[#111111] border ${isFailed ? 'border-white/25 border-dashed' : 'border-hairline'} space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="w-6 h-6 rounded-lg bg-[#18181B] flex items-center justify-center text-zinc-200">
+                    ${PLATFORM_SVGS[t.platformId]}
+                  </span>
+                  <div class="min-w-0">
+                    <p class="text-xs font-bold text-zinc-100 truncate">${pName}</p>
+                    <p class="font-mono text-[10px] ${isFailed ? 'text-zinc-200 font-semibold' : 'text-zinc-500'} truncate">${t.note}</p>
+                  </div>
+                </div>
+
+                ${isFailed
+                  ? `<button type="button" onclick="retryFailedTarget('${job.id}', '${t.platformId}')" class="px-2.5 py-1.5 rounded-lg neon-btn-primary font-mono text-[10px] font-extrabold shrink-0">
+                      Coba Lagi (Retry)
+                   </button>`
+                  : `<span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded text-zinc-300">${t.status}</span>`
+                }
+              </div>
+
+              <div class="w-full h-1.5 rounded-full bg-black overflow-hidden border border-white/[0.06]">
+                <div
+                  class="h-full rounded-full transition-all duration-300 ${
+                    isProcessing ? 'progress-bar-subtle' : isFailed ? 'bg-zinc-600' : 'bg-[#E4E4E7]'
+                  }"
+                  style="width: ${t.progress}%"
+                ></div>
+              </div>
+            </div>
+          `
+        }).join('')
+
+        return `
+          <div class="rounded-2xl bg-[#0A0A0A] border ${job.overallStatus === 'PROSES' ? 'neon-card-active' : 'border-hairline'} p-4 space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0">
+                <h3 class="text-sm font-bold text-zinc-100 truncate">${job.title}</h3>
+                <p class="font-mono text-[10px] text-zinc-500 mt-0.5">${job.timestamp}</p>
+              </div>
+              <div class="shrink-0">${badge}</div>
+            </div>
+
+            <div class="space-y-2">
+              ${targetsHTML}
+            </div>
+          </div>
+        `
+      }).join('')
+    }
+
+    function retryFailedTarget(jobId, platformId) {
+      const job = appState.queueItems.find(j => j.id === jobId)
+      if (!job) return
+      const target = job.targets.find(t => t.platformId === platformId)
+      if (!target) return
+
+      target.status = 'PROSES'
+      target.progress = 25
+      target.note = 'Menghubungkan ulang API...'
+      job.overallStatus = 'PROSES'
+      renderQueueList()
+      showToast('Mengulang unggahan ke API platform...')
+
+      const retryInterval = setInterval(() => {
+        target.progress = Math.min(100, target.progress + 25)
+        if (target.progress < 100) {
+          target.note = `Mengunggah ulang (${target.progress}%)...`
+        } else {
+          target.status = 'SELESAI'
+          target.note = 'Tayang • Berhasil setelah Retry'
+          job.overallStatus = 'SELESAI'
+          clearInterval(retryInterval)
+          showToast('Retry berhasil! Video kini tayang.')
+        }
+        renderQueueList()
+      }, 380)
+    }
+
+    // =========================================================================
+    // TAB 4: AKUN OAUTH 2.0 LOGIC
+    // =========================================================================
+    function renderOAuthAccounts() {
+      const list = document.getElementById('oauth-accounts-list')
+      list.innerHTML = appState.platforms.map(p => {
+        if (p.connected) {
+          return `
+            <div class="rounded-2xl bg-[#0A0A0A] border border-white/[0.16] p-4 space-y-3 transition">
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-10 h-10 rounded-2xl bg-[#E4E4E7] text-[#09090B] flex items-center justify-center shrink-0">
+                    ${PLATFORM_SVGS[p.id]}
+                  </div>
+                  <div class="min-w-0">
+                    <h3 class="text-sm font-bold text-zinc-100 truncate">${p.name}</h3>
+                    <p class="font-mono text-xs text-zinc-300 truncate">${p.handle}</p>
+                    <p class="font-mono text-[10px] text-zinc-500 mt-0.5">${p.followers}</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onclick="openDisconnectModal('${p.id}')"
+                  class="px-3 py-2 rounded-xl bg-[#111111] hover:bg-[#191919] border border-hairline text-[11px] font-semibold text-zinc-300 transition shrink-0 active:scale-95"
+                >
+                  Putuskan
+                </button>
+              </div>
+
+              <div class="pt-2.5 border-t border-hairline flex items-center justify-between">
+                <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#111111] border border-white/[0.1]">
+                  <span class="w-1.5 h-1.5 rounded-full neon-dot-subtle animate-subtle-pulse"></span>
+                  <span class="font-mono text-[10px] font-semibold tracking-wider text-zinc-200">AKTIF • AUTO-REFRESH</span>
+                </div>
+                <span class="font-mono text-[10px] text-zinc-500">${p.apiLabel}</span>
+              </div>
+            `
+        } else {
+          return `
+            <div class="rounded-2xl bg-[#0A0A0A] border border-hairline p-4 flex items-center justify-between gap-3 transition hover:border-white/[0.16]">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-2xl bg-[#111111] border border-hairline text-zinc-500 flex items-center justify-center shrink-0">
+                  ${PLATFORM_SVGS[p.id]}
+                </div>
+                <div class="min-w-0">
+                  <h3 class="text-sm font-bold text-zinc-300 truncate">${p.name}</h3>
+                  <p class="font-mono text-[10px] text-zinc-500 mt-0.5">BELUM TERHUBUNG</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onclick="openOAuthModal('${p.id}')"
+                class="px-3.5 py-2.5 rounded-xl neon-btn-primary text-xs font-extrabold shrink-0"
+              >
+                Hubungkan Akun
+              </button>
+            `
+        }
+      }).join('')
+    }
+
+    function openOAuthModal(platformId) {
+      const platform = appState.platforms.find(p => p.id === platformId)
+      if (!platform) return
+
+      appState.pendingOAuthPlatformId = platformId
+      document.getElementById('oauth-modal-icon').innerHTML = PLATFORM_SVGS[platformId]
+      document.getElementById('oauth-modal-title').textContent = `Izinkan NEXUS // POST mengakses akun ${platform.name} Anda?`
+      document.getElementById('oauth-modal-subtitle').textContent = `Otorisasi Resmi via ${platform.apiLabel}`
+      document.getElementById('oauth-modal').classList.remove('hidden')
+    }
+
+    function closeOAuthModal() {
+      appState.pendingOAuthPlatformId = null
+      document.getElementById('oauth-modal').classList.add('hidden')
+    }
+
+    function approveOAuthConnection() {
+      const platformId = appState.pendingOAuthPlatformId
+      if (!platformId) return
+
+      const btn = document.getElementById('btn-oauth-approve')
+      btn.innerHTML = `<span class="font-mono text-[11px]">MENGHUBUNGKAN...</span>`
+      btn.disabled = true
+
+      setTimeout(() => {
+        const platform = appState.platforms.find(p => p.id === platformId)
+        if (platform) {
+          platform.connected = true
+          platform.selected = true
+          platform.handle = platform.demoConnectHandle
+          platform.followers = platform.demoFollowers
+        }
+
+        btn.innerHTML = `<span>Izinkan Akses</span>`
+        btn.disabled = false
+        closeOAuthModal()
+
+        renderOAuthAccounts()
+        renderStudioPlatforms()
+        if (appState.activeTab === 'analitik' && !appState.analyticsState.selectedVideoId) {
+          renderPlatformChannelOverview()
+        }
+        showToast(`${platform.name} (${platform.handle}) berhasil terhubung!`)
+      }, 600)
+    }
+
+    function openDisconnectModal(platformId) {
+      const platform = appState.platforms.find(p => p.id === platformId)
+      if (!platform) return
+      appState.pendingDisconnectPlatformId = platformId
+      document.getElementById('disconnect-modal-title').textContent = `Putuskan Koneksi ${platform.name}?`
+      document.getElementById('disconnect-modal').classList.remove('hidden')
+    }
+
+    function closeDisconnectModal() {
+      appState.pendingDisconnectPlatformId = null
+      document.getElementById('disconnect-modal').classList.add('hidden')
+    }
+
+    function confirmDisconnectAccount() {
+      const platformId = appState.pendingDisconnectPlatformId
+      const platform = appState.platforms.find(p => p.id === platformId)
+      if (platform) {
+        platform.connected = false
+        platform.selected = false
+        platform.handle = ''
+        platform.followers = ''
+        showToast(`Koneksi ${platform.name} diputus`)
+      }
+      closeDisconnectModal()
+      renderOAuthAccounts()
+      renderStudioPlatforms()
+      if (appState.activeTab === 'analitik' && !appState.analyticsState.selectedVideoId) {
+        renderPlatformChannelOverview()
+      }
+    }
+  </script>
+</body>
+</html>

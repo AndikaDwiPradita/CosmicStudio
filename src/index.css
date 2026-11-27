@@ -1,0 +1,145 @@
+/* ==========================================================================
+   Cosmic Studio — OLED Monochrome Theme
+   ========================================================================== */
+
+/* Root CSS Variables for theming */
+:root {
+  --oled-black: #000000;
+  --oled-surface: #0A0A0A;
+  --oled-surface-elevated: #111111;
+  --hairline-border: #1E1E24;
+  --soft-white: #E4E4E7;
+  --muted-gray: #71717A;
+  --muted-neutral: #A1A1AA;
+}
+
+/* Base styles */
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--oled-black);
+  color: var(--soft-white);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Subtle dark backdrop outside mobile frame on desktop */
+.desktop-backdrop {
+  background-color: #030304;
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.025) 0%, transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+  background-size: 100% 100%, 36px 36px, 36px 36px;
+}
+
+/* --- Subtle 10-20% White Neon Glow Tokens (Zero Glare) --- */
+
+/* Subtle text with soft white glow */
+.neon-text-subtle {
+  color: var(--soft-white);
+  text-shadow: 0 0 8px rgba(228, 228, 231, 0.16);
+}
+
+/* Active card with subtle glow */
+.neon-card-active {
+  border-color: rgba(255, 255, 255, 0.26) !important;
+  box-shadow: 0 0 14px rgba(228, 228, 231, 0.14), inset 0 0 8px rgba(255, 255, 231, 0.03);
+}
+
+/* Soft halo effect */
+.neon-halo-soft {
+  box-shadow: 0 0 14px rgba(255, 255, 231, 0.12);
+}
+
+/* Primary action button */
+.neon-btn-primary {
+  background-color: var(--soft-white);
+  color: #09090B;
+  box-shadow: 0 0 14px rgba(228, 228, 231, 0.14);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neon-btn-primary:hover:not(:disabled) {
+  background-color: #F4F4F5;
+  box-shadow: 0 0 16px rgba(255, 255, 231, 0.18);
+  transform: translateY(-1px);
+}
+
+.neon-btn-primary:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.neon-btn-primary:disabled {
+  background-color: var(--oled-surface);
+  color: var(--muted-neutral);
+  box-shadow: none;
+  border: 1px solid var(--hairline-border);
+  cursor: not-allowed;
+}
+
+/* Subtle icon glow */
+.neon-icon-subtle {
+  filter: drop-shadow(0 0 4px rgba(255, 255, 231, 0.16));
+}
+
+/* Subtle dot accent */
+.neon-dot-subtle {
+  background-color: var(--soft-white);
+  box-shadow: 0 0 6px rgba(255, 255, 231, 0.20);
+}
+
+/* Crisp hairline borders */
+.border-hairline {
+  border-color: rgba(255, 255, 231, 0.08);
+}
+
+/* --- Scrollbar Styling --- */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* --- Subtle Pulse Animation --- */
+@keyframes subtlePulse {
+  0%, 100% {
+    opacity: 0.9;
+    box-shadow: 0 0 6px rgba(255, 255, 231, 0.2);
+  }
+  50% {
+    opacity: 0.4;
+    box-shadow: 0 0 2px rgba(255, 255, 231, 0.08);
+  }
+}
+
+.animate-subtle-pulse {
+  animation: subtlePulse 2.8s infinite ease-in-out;
+}
+
+/* --- Subtle Shimmer Progress Bar --- */
+@keyframes subtleShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.progress-bar-subtle {
+  background: linear-gradient(90deg, #D4D4D8 0%, #8E8E93 50%, #D4D4D8 100%);
+  background-size: 200% 100%;
+  animation: subtleShimmer 2s linear infinite;
+  box-shadow: 0 0 8px rgba(255, 255, 231, 0.12);
+}
+
+/* --- Dark Calendar/Time Picker Icons --- */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+  cursor: pointer;
+}
