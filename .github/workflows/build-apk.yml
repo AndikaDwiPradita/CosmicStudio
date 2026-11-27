@@ -25,36 +25,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Configure Gradle Java Options
-        run: |
-          mkdir -p ~/.gradle
-          echo "org.gradle.jvmargs=-Xmx512m --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED" >> ~/.gradle/gradle.properties
-
       - name: Install Dependencies
         run: npm install
 
       - name: Build Web App
         run: npm run build
-
-      - name: Setup Android SDK
-        run: |
-          ANDROID_ROOT=/usr/local/android/sdk
-          if [ -d "$ANDROID_ROOT" ]; then
-            echo "Android SDK found at $ANDROID_ROOT"
-            export ANDROID_HOME=$ANDROID_ROOT
-          else
-            ANDROID_ROOT=/usr/lib/android/sdk
-            if [ -d "$ANDROID_ROOT" ]; then
-              echo "Android SDK found at $ANDROID_ROOT"
-              export ANDROID_HOME=$ANDROID_ROOT
-            else
-              echo "Android SDK not found at default paths"
-              ls /usr/local/android/sdk/ 2>/dev/null || echo "No SDK at /usr/local/android/sdk"
-              ls /usr/lib/android/sdk/ 2>/dev/null || echo "No SDK at /usr/lib/android/sdk"
-            fi
-          fi
-          mkdir -p $ANDROID_HOME
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
 
       - name: Add Android Platform
         run: npx cap add android
@@ -66,9 +41,7 @@ jobs:
         run: chmod +x android/gradlew
 
       - name: Build Android APK
-        run: |
-          cd android
-          ANDROID_HOME=$ANDROID_HOME ./gradlew assembleDebug
+        run: cd android && ./gradlew assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
